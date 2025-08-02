@@ -19,7 +19,8 @@ interface Recipe {
     calories: number
     protein: number
     fat: number
-    carbs: number
+    carbs?: number
+    carbohydrates?: number
   }
 }
 
@@ -52,11 +53,19 @@ export default function RecipeSelectionDialog({
   const fetchRecipes = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/recipes?category=${mealType}`)
+      console.log(`Fetching recipes for ${mealType}...`)
+      const response = await fetch(`/api/recipes?category=${mealType}&limit=50`)
+      console.log('API Response status:', response.status)
+      
       if (response.ok) {
         const data = await response.json()
+        console.log('API Response data:', data)
+        console.log('Recipes count:', data.recipes?.length || 0)
+        
         setRecipes(data.recipes || [])
         setFilteredRecipes(data.recipes || [])
+      } else {
+        console.error('API Error:', await response.text())
       }
     } catch (error) {
       console.error('Error fetching recipes:', error)
@@ -180,7 +189,7 @@ export default function RecipeSelectionDialog({
                       <div>カロリー: {recipe.nutrition.calories}kcal</div>
                       <div>タンパク質: {recipe.nutrition.protein}g</div>
                       <div>脂質: {recipe.nutrition.fat}g</div>
-                      <div>炭水化物: {recipe.nutrition.carbs}g</div>
+                      <div>炭水化物: {recipe.nutrition.carbs || recipe.nutrition.carbohydrates || 0}g</div>
                     </div>
                   </div>
                 ))}

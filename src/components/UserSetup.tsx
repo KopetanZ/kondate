@@ -22,7 +22,13 @@ interface UserPreferencesForm {
   allergies: string[]
 }
 
-export default function UserSetup({ onComplete }: { onComplete: (preferences: UserPreferencesForm) => void }) {
+interface UserSetupProps {
+  onComplete: (preferences: UserPreferencesForm) => void
+  currentUser?: { id: string; familyName: string; familyIcon: string }
+  onLogout?: () => void
+}
+
+export default function UserSetup({ onComplete, currentUser, onLogout }: UserSetupProps) {
   const [step, setStep] = useState(1)
   const [preferences, setPreferences] = useState<UserPreferencesForm>({
     familySize: 2,
@@ -92,12 +98,27 @@ export default function UserSetup({ onComplete }: { onComplete: (preferences: Us
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-2xl">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">
-            初期設定 - {step}/4
-          </CardTitle>
-          <CardDescription className="text-center">
-            あなたの食事の好みや家族構成を教えてください
-          </CardDescription>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle className="text-2xl font-bold">
+                初期設定 - {step}/4
+              </CardTitle>
+              <CardDescription>
+                あなたの食事の好みや家族構成を教えてください
+              </CardDescription>
+            </div>
+            {currentUser && (
+              <div className="flex items-center space-x-2">
+                <span className="text-2xl">{currentUser.familyIcon}</span>
+                <span className="text-sm font-medium">{currentUser.familyName}</span>
+                {onLogout && (
+                  <Button variant="outline" size="sm" onClick={onLogout}>
+                    ログアウト
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
         </CardHeader>
         
         <CardContent className="space-y-6">

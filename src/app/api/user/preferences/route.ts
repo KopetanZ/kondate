@@ -18,23 +18,21 @@ export async function POST(request: NextRequest) {
       allergies
     } = body
 
-    // 一旦固定ユーザーIDを使用（後でセッション管理を実装）
-    const fixedUserId = userId || 'demo-user'
-
-    // ユーザーが存在しない場合は作成
-    await prisma.user.upsert({
-      where: { id: fixedUserId },
-      update: {},
-      create: {
-        id: fixedUserId,
-        email: `${fixedUserId}@example.com`,
-        name: 'Demo User'
-      }
+    // ユーザーが存在するかチェック
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
     })
+
+    if (!user) {
+      return NextResponse.json({
+        success: false,
+        error: 'ユーザーが見つかりません'
+      }, { status: 404 })
+    }
 
     // ユーザー設定を保存
     const preferences = await prisma.userPreferences.upsert({
-      where: { userId: fixedUserId },
+      where: { userId: userId },
       update: {
         familySize,
         hasChildren,
@@ -48,7 +46,7 @@ export async function POST(request: NextRequest) {
         allergies: JSON.stringify(allergies)
       },
       create: {
-        userId: fixedUserId,
+        userId: userId,
         familySize,
         hasChildren,
         hasElderly,
@@ -82,7 +80,14 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const userId = searchParams.get('userId') || 'demo-user'
+    const userId = searchParams.get('userId')
+
+    if (!userId) {
+      return NextResponse.json({
+        success: false,
+        error: 'ユーザーIDが必要です'
+      }, { status: 400 })
+    }
 
     const preferences = await prisma.userPreferences.findUnique({
       where: { userId }

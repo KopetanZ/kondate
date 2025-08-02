@@ -1,20 +1,38 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import UserSelector from '@/components/UserSelector'
+import Register from '@/components/Register'
 import UserSetup from '@/components/UserSetup'
 import MealPlannerDashboard from '@/components/MealPlannerDashboard'
 
+interface User {
+  id: string
+  familyName: string
+  familyIcon: string
+}
+
 export default function Home() {
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
+  const [showRegister, setShowRegister] = useState(false)
   const [isSetupComplete, setIsSetupComplete] = useState(false)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    checkUserSetup()
+    // ローカルストレージからユーザー情報を復元
+    const savedUser = localStorage.getItem('currentUser')
+    if (savedUser) {
+      const user = JSON.parse(savedUser)
+      setCurrentUser(user)
+      checkUserSetup(user.id)
+    } else {
+      setLoading(false)
+    }
   }, [])
 
-  const checkUserSetup = async () => {
+  const checkUserSetup = async (userId: string) => {
     try {
-      const response = await fetch('/api/user/preferences?userId=demo-user')
+      const response = await fetch(`/api/user/preferences?userId=${userId}`)
       if (response.ok) {
         setIsSetupComplete(true)
       }
@@ -25,7 +43,22 @@ export default function Home() {
     }
   }
 
+  const handleLoginSuccess = (user: User) => {
+    setCurrentUser(user)
+    localStorage.setItem('currentUser', JSON.stringify(user))
+    checkUserSetup(user.id)
+  }
+
+  const handleRegisterSuccess = (user: User) => {
+    setCurrentUser(user)
+    localStorage.setItem('currentUser', JSON.stringify(user))
+    setLoading(false)
+    setIsSetupComplete(false) // 新規ユーザーは設定が必要
+  }
+
   const handleSetupComplete = async (preferences: any) => {
+    if (!currentUser) return
+
     try {
       const response = await fetch('/api/user/preferences', {
         method: 'POST',
@@ -33,7 +66,7 @@ export default function Home() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: 'demo-user',
+          userId: currentUser.id,
           ...preferences
         })
       })
@@ -48,6 +81,12 @@ export default function Home() {
     }
   }
 
+  const handleLogout = () => {
+    setCurrentUser(null)
+    setIsSetupComplete(false)
+    localStorage.removeItem('currentUser')
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -59,9 +98,30 @@ export default function Home() {
     )
   }
 
-  if (!isSetupComplete) {
-    return <UserSetup onComplete={handleSetupComplete} />
+  // ユーザーがログインしていない場合
+  if (!currentUser) {
+    if (showRegister) {
+      return (
+        <Register
+          onRegisterSuccess={handleRegisterSuccess}
+          onSwitchToLogin={() => setShowRegister(false)}
+        />
+      )
+    } else {
+      return (
+        <UserSelector
+          onLoginSuccess={handleLoginSuccess}
+          onSwitchToRegister={() => setShowRegister(true)}
+        />
+      )
+    }
   }
 
-  return <MealPlannerDashboard />
+  // ユーザーはログイン済みだが設定未完了
+  if (!isSetupComplete) {
+    return <UserSetup onComplete={handleSetupComplete} currentUser={currentUser} onLogout={handleLogout} />
+  }
+
+  // すべて完了済み
+  return <MealPlannerDashboard currentUser={currentUser} onLogout={handleLogout} />
 }

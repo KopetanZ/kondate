@@ -6,16 +6,17 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = env("DATABASE_PROVIDER") != null ? env("DATABASE_PROVIDER") : "sqlite"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  familyName   String   @unique  // 〇〇家のID
+  familyIcon   String             // 家族のアイコン（絵文字など）
+  password     String             // 絵4つのパスワード（JSON配列として保存）
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   preferences     UserPreferences?
   mealPlans       MealPlan[]

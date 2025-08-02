@@ -21,7 +21,12 @@ interface DayMealPlan {
   dinner: Recipe | null
 }
 
-export default function MealPlannerDashboard() {
+interface MealPlannerDashboardProps {
+  currentUser: { id: string; familyName: string; familyIcon: string }
+  onLogout: () => void
+}
+
+export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlannerDashboardProps) {
   const [currentWeek, setCurrentWeek] = useState(new Date())
   const [mealPlans, setMealPlans] = useState<DayMealPlan[]>([])
   const [loading, setLoading] = useState(false)
@@ -64,7 +69,7 @@ export default function MealPlannerDashboard() {
   const fetchMealPlans = async (weekStart: Date) => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/meal-plan?userId=demo-user&weekStartDate=${weekStart.toISOString()}`)
+      const response = await fetch(`/api/meal-plan?userId=${currentUser.id}&weekStartDate=${weekStart.toISOString()}`)
       if (response.ok) {
         const data = await response.json()
         setMealPlans(data.data.plans || [])
@@ -86,7 +91,7 @@ export default function MealPlannerDashboard() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: 'demo-user',
+          userId: currentUser.id,
           weekStartDate: weekStart.toISOString(),
           considerSeasonality: true,
           avoidRecentMeals: true,
@@ -130,7 +135,7 @@ export default function MealPlannerDashboard() {
     return (
       <ShoppingList
         weekStartDate={shoppingListWeekStart?.toISOString()}
-        userId="demo-user"
+        userId={currentUser.id}
         onBack={() => {
           setShowShoppingList(false)
           setShoppingListWeekStart(null)
@@ -146,15 +151,24 @@ export default function MealPlannerDashboard() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-3xl font-bold text-gray-900">献立プランナー</h1>
-            <div className="flex space-x-2">
-              <Button variant="outline" size="sm">
-                <Settings className="w-4 h-4 mr-2" />
-                設定
-              </Button>
-              <Button size="sm">
-                <Plus className="w-4 h-4 mr-2" />
-                献立を追加
-              </Button>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <span className="text-2xl">{currentUser.familyIcon}</span>
+                <span className="font-medium">{currentUser.familyName}</span>
+              </div>
+              <div className="flex space-x-2">
+                <Button variant="outline" size="sm">
+                  <Settings className="w-4 h-4 mr-2" />
+                  設定
+                </Button>
+                <Button size="sm">
+                  <Plus className="w-4 h-4 mr-2" />
+                  献立を追加
+                </Button>
+                <Button variant="outline" size="sm" onClick={onLogout}>
+                  ログアウト
+                </Button>
+              </div>
             </div>
           </div>
           

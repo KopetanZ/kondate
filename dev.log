@@ -141,3 +141,8 @@ Foreign key constraint violated on the foreign key
   clientVersion: '6.13.0'
 }
  POST /api/meal-plan/generate 500 in 178ms
+prisma:query SELECT 1
+prisma:query SELECT `main`.`recipes`.`id`, `main`.`recipes`.`name`, `main`.`recipes`.`category`, `main`.`recipes`.`cookingTime`, `main`.`recipes`.`difficulty`, `main`.`recipes`.`servings`, `main`.`recipes`.`instructions`, `main`.`recipes`.`nutrition`, `main`.`recipes`.`seasonality`, `main`.`recipes`.`tags`, `main`.`recipes`.`userRating`, `main`.`recipes`.`familyRating`, `main`.`recipes`.`notes`, `main`.`recipes`.`userId`, `main`.`recipes`.`createdAt`, `main`.`recipes`.`updatedAt` FROM `main`.`recipes` WHERE 1=1 ORDER BY CASE WHEN `main`.`recipes`.`userRating` IS NULL THEN 1 ELSE 0 END, `main`.`recipes`.`userRating` DESC, `main`.`recipes`.`name` ASC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`recipe_ingredients`.`id`, `main`.`recipe_ingredients`.`recipeId`, `main`.`recipe_ingredients`.`ingredientId`, `main`.`recipe_ingredients`.`quantity`, `main`.`recipe_ingredients`.`unit` FROM `main`.`recipe_ingredients` WHERE `main`.`recipe_ingredients`.`recipeId` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`ingredients`.`id`, `main`.`ingredients`.`name`, `main`.`ingredients`.`category`, `main`.`ingredients`.`unit`, `main`.`ingredients`.`nutritionPer100g`, `main`.`ingredients`.`peakSeasons`, `main`.`ingredients`.`storageType`, `main`.`ingredients`.`shelfLife`, `main`.`ingredients`.`createdAt`, `main`.`ingredients`.`updatedAt` FROM `main`.`ingredients` WHERE `main`.`ingredients`.`id` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) LIMIT ? OFFSET ?
+ GET /api/recipes?limit=5 200 in 27ms

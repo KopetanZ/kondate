@@ -1,0 +1,287 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  preferences     UserPreferences?
+  mealPlans       MealPlan[]
+  weeklyMealPlans WeeklyMealPlan[]
+  shoppingLists   ShoppingList[]
+  nutritionTarget NutritionTarget?
+  recipes         Recipe[]
+
+  @@map("users")
+}
+
+model UserPreferences {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 基本設定
+  familySize  Int     @default(2)
+  hasChildren Boolean @default(false)
+  hasElderly  Boolean @default(false)
+
+  // 食事スタイル
+  allowsCurryTwoDays   Boolean @default(true)
+  eatsBreakfastBread   Boolean @default(true)
+  eatsGranolaOrCereal  Boolean @default(false)
+  wantsRestDays        Boolean @default(true)
+  usesFrozenFoods      Boolean @default(true)
+  usesPreparedFoods    Boolean @default(true)
+
+  // アレルギー情報（JSON配列として保存）
+  allergies String @default("[]")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user_preferences")
+}
+
+model Recipe {
+  id           String      @id @default(cuid())
+  name         String
+  category     MealType
+  cookingTime  Int // 分
+  difficulty   Int // 1-5
+  servings     Int
+  instructions String // JSON配列として保存
+  
+  // 栄養情報（JSON として保存）
+  nutrition String
+  
+  // 季節性（JSON配列として保存）
+  seasonality String @default("[]")
+  
+  // タグ（JSON配列として保存）
+  tags String @default("[]")
+  
+  // 評価情報
+  userRating   Float?
+  familyRating Float?
+  notes        String?
+
+  // 作成者
+  userId String?
+  user   User?  @relation(fields: [userId], references: [id])
+
+  // リレーション
+  ingredients    RecipeIngredient[]
+  breakfastPlans MealPlan[]         @relation("BreakfastRecipe")
+  lunchPlans     MealPlan[]         @relation("LunchRecipe")
+  dinnerPlans    MealPlan[]         @relation("DinnerRecipe")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("recipes")
+}
+
+model Ingredient {
+  id       String             @id @default(cuid())
+  name     String             @unique
+  category IngredientCategory
+  unit     String             @default("g")
+
+  // 栄養情報（100gあたり、JSONとして保存）
+  nutritionPer100g String
+
+  // 季節性（JSON配列として保存）
+  peakSeasons String @default("[]")
+
+  // 保存情報
+  storageType String @default("pantry") // refrigerated, frozen, pantry
+  shelfLife   Int    @default(7) // 日数
+
+  // リレーション
+  recipeIngredients RecipeIngredient[]
+  shoppingItems     ShoppingItem[]
+  seasonalProduce   SeasonalProduce[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("ingredients")
+}
+
+model RecipeIngredient {
+  id         String @id @default(cuid())
+  recipeId   String
+  recipe     Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  ingredientId String
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id])
+  quantity   Float
+  unit       String
+
+  @@unique([recipeId, ingredientId])
+  @@map("recipe_ingredients")
+}
+
+model MealPlan {
+  id     String   @id @default(cuid())
+  userId String
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date   DateTime
+
+  // 各食事のレシピ
+  breakfastId String?
+  breakfast   Recipe? @relation("BreakfastRecipe", fields: [breakfastId], references: [id])
+  lunchId     String?
+  lunch       Recipe? @relation("LunchRecipe", fields: [lunchId], references: [id])
+  dinnerId    String?
+  dinner      Recipe? @relation("DinnerRecipe", fields: [dinnerId], references: [id])
+
+  // 生成情報
+  isGenerated         Boolean @default(false)
+  generationSettings  String? // JSON として保存
+
+  // ユーザー評価
+  userRating     Float?
+  familyFeedback String? // JSON配列として保存
+  notes          String?
+
+  // リレーション
+  weeklyMealPlan   WeeklyMealPlan? @relation(fields: [weeklyMealPlanId], references: [id])
+  weeklyMealPlanId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@map("meal_plans")
+}
+
+model WeeklyMealPlan {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weekStartDate DateTime
+
+  // 総栄養情報（JSON として保存）
+  totalNutrition String
+
+  // リレーション
+  dailyPlans    MealPlan[]
+  shoppingLists ShoppingList[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, weekStartDate])
+  @@map("weekly_meal_plans")
+}
+
+model ShoppingList {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  weekStartDate DateTime
+  isCompleted   Boolean  @default(false)
+
+  // リレーション
+  items            ShoppingItem[]
+  weeklyMealPlan   WeeklyMealPlan? @relation(fields: [weeklyMealPlanId], references: [id])
+  weeklyMealPlanId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("shopping_lists")
+}
+
+model ShoppingItem {
+  id             String        @id @default(cuid())
+  shoppingListId String
+  shoppingList   ShoppingList  @relation(fields: [shoppingListId], references: [id], onDelete: Cascade)
+  ingredientId   String
+  ingredient     Ingredient    @relation(fields: [ingredientId], references: [id])
+  
+  quantity        Float
+  unit            String
+  isPurchased     Boolean @default(false)
+  estimatedPrice  Float?
+  actualPrice     Float?
+  store           String?
+  notes           String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("shopping_items")
+}
+
+model NutritionTarget {
+  userId               String @id
+  user                 User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  dailyCalories       Float
+  dailyProtein        Float
+  dailyFat            Float
+  dailyCarbohydrates  Float
+  dailyFiber          Float
+  dailySodium         Float
+
+  updatedAt DateTime @updatedAt
+
+  @@map("nutrition_targets")
+}
+
+model SeasonalProduce {
+  id           String     @id @default(cuid())
+  ingredientId String
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  season       Season
+  peakMonth    Int // 1-12
+  
+  description         String?
+  nutritionalBenefits String?
+  cookingTips         String?
+
+  @@unique([ingredientId, season])
+  @@map("seasonal_produce")
+}
+
+// Enums
+enum MealType {
+  breakfast
+  lunch
+  dinner
+  snack
+}
+
+enum IngredientCategory {
+  vegetables
+  fruits
+  meat
+  fish
+  dairy
+  grains
+  legumes
+  seasonings
+  oils
+  others
+}
+
+enum Season {
+  spring
+  summer
+  autumn
+  winter
+}

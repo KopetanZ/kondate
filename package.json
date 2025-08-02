@@ -9,9 +9,12 @@
     "lint": "next lint",
     "seed": "tsx scripts/seed.ts",
     "seed:production": "tsx scripts/seed-production.ts",
+    "seed:users": "tsx scripts/seed-users.ts",
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
+    "db:dev:migrate": "prisma migrate dev --schema=prisma/schema.dev.prisma",
+    "db:dev:generate": "prisma generate --schema=prisma/schema.dev.prisma",
     "postinstall": "prisma generate"
   },
   "dependencies": {

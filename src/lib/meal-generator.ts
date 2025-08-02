@@ -51,13 +51,13 @@ export class MealGenerator {
       }
     }
 
-    // 季節を考慮する場合
-    if (season) {
-      whereClause.OR = [
-        { seasonality: { contains: season } },
-        { seasonality: { equals: '[]' } } // 季節を問わないレシピ
-      ]
-    }
+    // 季節を考慮する場合（現在は季節フィルタリングを無効化）
+    // if (season) {
+    //   whereClause.OR = [
+    //     { seasonality: { contains: season } },
+    //     { seasonality: { equals: '[]' } } // 季節を問わないレシピ
+    //   ]
+    // }
 
     const recipes = await prisma.recipe.findMany({
       where: whereClause,

@@ -2,8 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
 export async function POST(request: NextRequest) {
+  let familyName: string | undefined
+  let familyIcon: string | undefined
+  let password: any[] | undefined
+
   try {
-    const { familyName, familyIcon, password } = await request.json()
+    const body = await request.json()
+    familyName = body.familyName
+    familyIcon = body.familyIcon
+    password = body.password
 
     if (!familyName || !familyIcon || !password || !Array.isArray(password) || password.length !== 4) {
       return NextResponse.json(
@@ -47,9 +54,9 @@ export async function POST(request: NextRequest) {
     console.error('Error details:', {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
-      familyName,
-      familyIcon,
-      passwordLength: password?.length
+      familyName: familyName || 'undefined',
+      familyIcon: familyIcon || 'undefined',
+      passwordLength: password?.length || 0
     })
     return NextResponse.json(
       { 

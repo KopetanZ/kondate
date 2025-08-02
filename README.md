@@ -75,7 +75,9 @@ npm run dev
 #### Supabase（推奨）
 1. [Supabase](https://supabase.com/)でアカウント作成
 2. 新しいプロジェクト作成  
-3. Settings > Database > Connection string をコピー
+3. Settings > Database > Connection string から**Connection pooling**の文字列をコピー
+   - 形式: `postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true`
+4. SQL Editor でテーブルを作成（詳細は DATABASE_SETUP.md を参照）
 
 #### 他のPostgreSQLプロバイダー
 - Railway
@@ -91,7 +93,7 @@ npm run dev
 
 3. 環境変数を設定（Vercel Dashboard > Settings > Environment Variables）：
 ```
-DATABASE_URL=your_postgresql_connection_string
+DATABASE_URL=postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true
 NEXTAUTH_SECRET=your_secure_random_string
 NODE_ENV=production
 ```
@@ -100,13 +102,11 @@ NODE_ENV=production
 
 ### 3. データベースの初期化
 
-デプロイ後、以下のコマンドでデータベースを初期化：
+デプロイ後、Supabase SQL Editorでテーブル作成：
 
-```bash
-# ローカルで実行（本番DBに接続）
-DATABASE_URL="your_production_db_url" npx prisma migrate deploy
-DATABASE_URL="your_production_db_url" npm run seed
-```
+1. Supabase Dashboard > SQL Editor
+2. DATABASE_SETUP.md のSQLを実行してテーブル作成
+3. アプリで `/api/health` をテストしてデータベース接続を確認
 
 ## プロジェクト構造
 

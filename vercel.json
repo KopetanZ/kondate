@@ -1,5 +1,5 @@
 {
-  "buildCommand": "prisma generate && prisma db push && npm run build",
+  "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "nextjs",
@@ -9,7 +9,6 @@
     }
   },
   "env": {
-    "NODE_ENV": "production",
-    "PRISMA_GENERATE_DATAPROXY": "true"
+    "NODE_ENV": "production"
   }
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Search, Clock, Star } from 'lucide-react'
@@ -114,14 +114,14 @@ export default function RecipeSelectionDialog({
           <DialogTitle>
             {mealTypeLabels[mealType]}のレシピを選択
           </DialogTitle>
-          <div className="text-sm text-gray-600">
+          <DialogDescription>
             {new Date(date).toLocaleDateString('ja-JP', {
               year: 'numeric',
               month: 'long',
               day: 'numeric',
               weekday: 'long'
-            })}
-          </div>
+            })}のレシピを選んでください
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex-1 flex flex-col overflow-hidden">

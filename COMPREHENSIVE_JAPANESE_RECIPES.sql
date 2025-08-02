@@ -148,7 +148,12 @@ INSERT INTO ingredients (id, name, category, "nutritionPer100g", "peakSeasons", 
 -- 冷凍食品
 ('ing_frozen_mixed_vegetables', '冷凍ミックス野菜', 'vegetables', '{"calories": 79, "protein": 3.8, "fat": 0.3, "carbs": 17.6}', '["通年"]', 'frozen', 365),
 ('ing_frozen_gyoza', '冷凍餃子', 'others', '{"calories": 184, "protein": 8.2, "fat": 9.8, "carbs": 16.8}', '["通年"]', 'frozen', 365),
-('ing_frozen_edamame', '冷凍枝豆', 'vegetables', '{"calories": 135, "protein": 11.7, "fat": 6.2, "carbs": 8.8}', '["通年"]', 'frozen', 365)
+('ing_frozen_edamame', '冷凍枝豆', 'vegetables', '{"calories": 135, "protein": 11.7, "fat": 6.2, "carbs": 8.8}', '["通年"]', 'frozen', 365),
+
+-- 練り物・加工食品
+('ing_kamaboko', 'かまぼこ', 'fish', '{"calories": 95, "protein": 12.0, "fat": 0.9, "carbs": 9.7}', '["通年"]', 'refrigerated', 7),
+('ing_chikuwa', 'ちくわ', 'fish', '{"calories": 121, "protein": 12.2, "fat": 2.0, "carbs": 13.5}', '["通年"]', 'refrigerated', 7),
+('ing_hanpen', 'はんぺん', 'fish', '{"calories": 94, "protein": 9.9, "fat": 1.0, "carbs": 11.4}', '["通年"]', 'refrigerated', 5)
 ON CONFLICT (id) DO NOTHING;
 
 -- 朝食レシピ（30個）
@@ -478,8 +483,7 @@ INSERT INTO recipe_ingredients (id, "recipeId", "ingredientId", quantity, unit) 
 ('ri_d39_3', 'recipe_d39', 'ing_daikon', 80, 'g'),
 ('ri_d39_4', 'recipe_d39', 'ing_yuzu', 10, 'g'),
 
--- 追加の食材（かまぼこなど）
-('ri_missing_1', 'recipe_l06', 'ing_tofu', 50, 'g'), -- かまぼこの代替として豆腐を使用
+-- 追加の食材（不足していた関連付けを修正）
 
 -- 季節の特産品を使ったレシピの関連
 ('ri_spring_1', 'recipe_d36', 'ing_bamboo_shoots', 150, 'g'),

@@ -13,12 +13,27 @@ export interface MealGenerationOptions {
 
 export class MealGenerator {
   private async getUserPreferences(userId: string) {
-    const preferences = await prisma.userPreferences.findUnique({
+    let preferences = await prisma.userPreferences.findUnique({
       where: { userId }
     })
     
+    // ユーザー設定が存在しない場合はデフォルト設定を作成
     if (!preferences) {
-      throw new Error('ユーザー設定が見つかりません')
+      preferences = await prisma.userPreferences.create({
+        data: {
+          userId,
+          familySize: 2,
+          hasChildren: false,
+          hasElderly: false,
+          allowsCurryTwoDays: true,
+          eatsBreakfastBread: true,
+          eatsGranolaOrCereal: false,
+          wantsRestDays: true,
+          usesFrozenFoods: true,
+          usesPreparedFoods: true,
+          allergies: JSON.stringify([])
+        }
+      })
     }
     
     return {
@@ -256,7 +271,31 @@ export class MealGenerator {
 
   async saveMealPlan(userId: string, weeklyPlan: any) {
     try {
-      // 週間献立を保存
+      // 既存の週間献立と各日の献立を削除
+      const startDate = new Date(weeklyPlan.weekStartDate)
+      const endDate = new Date(startDate)
+      endDate.setDate(startDate.getDate() + 6)
+
+      // 既存の日次献立を削除
+      await prisma.mealPlan.deleteMany({
+        where: {
+          userId,
+          date: {
+            gte: startDate,
+            lte: endDate
+          }
+        }
+      })
+
+      // 既存の週間献立を削除
+      await prisma.weeklyMealPlan.deleteMany({
+        where: {
+          userId,
+          weekStartDate: startDate
+        }
+      })
+
+      // 新しい週間献立を保存
       const weeklyMealPlan = await prisma.weeklyMealPlan.create({
         data: {
           userId,

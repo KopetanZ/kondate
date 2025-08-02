@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Calendar, ChefHat, ShoppingCart, Settings, Plus, Loader2 } from 'lucide-react'
 import ShoppingList from './ShoppingList'
+import RecipeSelectionDialog from './RecipeSelectionDialog'
 
 interface Recipe {
   id: string
@@ -33,6 +34,9 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
   const [generating, setGenerating] = useState(false)
   const [showShoppingList, setShowShoppingList] = useState(false)
   const [shoppingListWeekStart, setShoppingListWeekStart] = useState<Date | null>(null)
+  const [showRecipeDialog, setShowRecipeDialog] = useState(false)
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [selectedMealType, setSelectedMealType] = useState<'breakfast' | 'lunch' | 'dinner'>('breakfast')
 
   const getWeekDates = (date: Date) => {
     const week = []
@@ -131,6 +135,39 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
     setShowShoppingList(true)
   }
 
+  const openRecipeDialog = (date: Date, mealType: 'breakfast' | 'lunch' | 'dinner') => {
+    setSelectedDate(date.toISOString())
+    setSelectedMealType(mealType)
+    setShowRecipeDialog(true)
+  }
+
+  const handleRecipeSelect = async (recipe: any) => {
+    if (!selectedDate) return
+
+    try {
+      const response = await fetch('/api/meal-plan', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: currentUser.id,
+          date: selectedDate,
+          mealType: selectedMealType,
+          recipeId: recipe.id
+        })
+      })
+
+      if (response.ok) {
+        // 献立を再取得
+        const weekStart = getWeekStartDate(currentWeek)
+        await fetchMealPlans(weekStart)
+      }
+    } catch (error) {
+      console.error('Error adding meal:', error)
+    }
+  }
+
   if (showShoppingList) {
     return (
       <ShoppingList
@@ -161,7 +198,10 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
                   <Settings className="w-4 h-4 mr-2" />
                   設定
                 </Button>
-                <Button size="sm">
+                <Button 
+                  size="sm"
+                  onClick={() => openRecipeDialog(new Date(), 'breakfast')}
+                >
                   <Plus className="w-4 h-4 mr-2" />
                   献立を追加
                 </Button>
@@ -210,7 +250,10 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
                   ) : (
                     <>
                       {/* 朝食 */}
-                      <div className="bg-yellow-50 rounded-lg p-3">
+                      <div 
+                        className="bg-yellow-50 rounded-lg p-3 cursor-pointer hover:bg-yellow-100 transition-colors"
+                        onClick={() => openRecipeDialog(date, 'breakfast')}
+                      >
                         <div className="text-xs font-medium text-yellow-700 mb-1">朝食</div>
                         <div className="text-sm text-gray-600 min-h-[20px]">
                           {dayPlan?.breakfast ? (
@@ -223,13 +266,16 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
                               )}
                             </div>
                           ) : (
-                            '未設定'
+                            <div className="text-gray-400">未設定 - クリックして追加</div>
                           )}
                         </div>
                       </div>
                       
                       {/* 昼食 */}
-                      <div className="bg-orange-50 rounded-lg p-3">
+                      <div 
+                        className="bg-orange-50 rounded-lg p-3 cursor-pointer hover:bg-orange-100 transition-colors"
+                        onClick={() => openRecipeDialog(date, 'lunch')}
+                      >
                         <div className="text-xs font-medium text-orange-700 mb-1">昼食</div>
                         <div className="text-sm text-gray-600 min-h-[20px]">
                           {dayPlan?.lunch ? (
@@ -242,13 +288,16 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
                               )}
                             </div>
                           ) : (
-                            '未設定'
+                            <div className="text-gray-400">未設定 - クリックして追加</div>
                           )}
                         </div>
                       </div>
                       
                       {/* 夕食 */}
-                      <div className="bg-purple-50 rounded-lg p-3">
+                      <div 
+                        className="bg-purple-50 rounded-lg p-3 cursor-pointer hover:bg-purple-100 transition-colors"
+                        onClick={() => openRecipeDialog(date, 'dinner')}
+                      >
                         <div className="text-xs font-medium text-purple-700 mb-1">夕食</div>
                         <div className="text-sm text-gray-600 min-h-[20px]">
                           {dayPlan?.dinner ? (
@@ -268,15 +317,26 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
                               )}
                             </div>
                           ) : (
-                            '未設定'
+                            <div className="text-gray-400">未設定 - クリックして追加</div>
                           )}
                         </div>
                       </div>
 
-                      <Button variant="outline" size="sm" className="w-full mt-2">
-                        <Plus className="w-3 h-3 mr-1" />
-                        追加
-                      </Button>
+                      {/* Add Button */}
+                      <div className="pt-2 border-t">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full text-xs"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            openRecipeDialog(date, 'breakfast')
+                          }}
+                        >
+                          <Plus className="w-3 h-3 mr-1" />
+                          追加
+                        </Button>
+                      </div>
                     </>
                   )}
                 </CardContent>
@@ -399,6 +459,18 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
           </Card>
         </div>
       </div>
+
+      {/* Recipe Selection Dialog */}
+      <RecipeSelectionDialog
+        open={showRecipeDialog}
+        onClose={() => {
+          setShowRecipeDialog(false)
+          setSelectedDate(null)
+        }}
+        onSelect={handleRecipeSelect}
+        mealType={selectedMealType}
+        date={selectedDate || new Date().toISOString()}
+      />
     </div>
   )
 }

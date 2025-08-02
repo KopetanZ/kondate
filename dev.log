@@ -1,0 +1,143 @@
+
+> meal-planner-app@0.1.0 dev
+> next dev --turbopack
+
+   ▲ Next.js 15.4.5 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://10.255.255.254:3000
+   - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 735ms
+ ○ Compiling /api/recipes ...
+ ✓ Compiled /api/recipes in 840ms
+prisma:query SELECT `main`.`recipes`.`id`, `main`.`recipes`.`name`, `main`.`recipes`.`category`, `main`.`recipes`.`cookingTime`, `main`.`recipes`.`difficulty`, `main`.`recipes`.`servings`, `main`.`recipes`.`instructions`, `main`.`recipes`.`nutrition`, `main`.`recipes`.`seasonality`, `main`.`recipes`.`tags`, `main`.`recipes`.`userRating`, `main`.`recipes`.`familyRating`, `main`.`recipes`.`notes`, `main`.`recipes`.`userId`, `main`.`recipes`.`createdAt`, `main`.`recipes`.`updatedAt` FROM `main`.`recipes` WHERE `main`.`recipes`.`category` = ? ORDER BY CASE WHEN `main`.`recipes`.`userRating` IS NULL THEN 1 ELSE 0 END, `main`.`recipes`.`userRating` DESC, `main`.`recipes`.`name` ASC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`recipe_ingredients`.`id`, `main`.`recipe_ingredients`.`recipeId`, `main`.`recipe_ingredients`.`ingredientId`, `main`.`recipe_ingredients`.`quantity`, `main`.`recipe_ingredients`.`unit` FROM `main`.`recipe_ingredients` WHERE `main`.`recipe_ingredients`.`recipeId` IN (?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`ingredients`.`id`, `main`.`ingredients`.`name`, `main`.`ingredients`.`category`, `main`.`ingredients`.`unit`, `main`.`ingredients`.`nutritionPer100g`, `main`.`ingredients`.`peakSeasons`, `main`.`ingredients`.`storageType`, `main`.`ingredients`.`shelfLife`, `main`.`ingredients`.`createdAt`, `main`.`ingredients`.`updatedAt` FROM `main`.`ingredients` WHERE `main`.`ingredients`.`id` IN (?) LIMIT ? OFFSET ?
+ GET /api/recipes?category=breakfast&limit=1 200 in 957ms
+ ✓ Compiled /api/meal-plan in 88ms
+prisma:query SELECT `main`.`meal_plans`.`id`, `main`.`meal_plans`.`userId`, `main`.`meal_plans`.`date`, `main`.`meal_plans`.`breakfastId`, `main`.`meal_plans`.`lunchId`, `main`.`meal_plans`.`dinnerId`, `main`.`meal_plans`.`isGenerated`, `main`.`meal_plans`.`generationSettings`, `main`.`meal_plans`.`userRating`, `main`.`meal_plans`.`familyFeedback`, `main`.`meal_plans`.`notes`, `main`.`meal_plans`.`weeklyMealPlanId`, `main`.`meal_plans`.`createdAt`, `main`.`meal_plans`.`updatedAt` FROM `main`.`meal_plans` WHERE (`main`.`meal_plans`.`userId` = ? AND `main`.`meal_plans`.`date` >= ? AND `main`.`meal_plans`.`date` <= ?) ORDER BY `main`.`meal_plans`.`date` ASC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`weekly_meal_plans`.`id`, `main`.`weekly_meal_plans`.`userId`, `main`.`weekly_meal_plans`.`weekStartDate`, `main`.`weekly_meal_plans`.`totalNutrition`, `main`.`weekly_meal_plans`.`createdAt`, `main`.`weekly_meal_plans`.`updatedAt` FROM `main`.`weekly_meal_plans` WHERE (`main`.`weekly_meal_plans`.`userId` = ? AND `main`.`weekly_meal_plans`.`weekStartDate` = ?) LIMIT ? OFFSET ?
+ GET /api/meal-plan?userId=demo-user&weekStartDate=2025-02-02T00:00:00.000Z 200 in 119ms
+ ✓ Compiled /api/meal-plan/generate in 94ms
+prisma:query SELECT `main`.`user_preferences`.`id`, `main`.`user_preferences`.`userId`, `main`.`user_preferences`.`familySize`, `main`.`user_preferences`.`hasChildren`, `main`.`user_preferences`.`hasElderly`, `main`.`user_preferences`.`allowsCurryTwoDays`, `main`.`user_preferences`.`eatsBreakfastBread`, `main`.`user_preferences`.`eatsGranolaOrCereal`, `main`.`user_preferences`.`wantsRestDays`, `main`.`user_preferences`.`usesFrozenFoods`, `main`.`user_preferences`.`usesPreparedFoods`, `main`.`user_preferences`.`allergies`, `main`.`user_preferences`.`createdAt`, `main`.`user_preferences`.`updatedAt` FROM `main`.`user_preferences` WHERE (`main`.`user_preferences`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query INSERT INTO `main`.`user_preferences` (`id`, `userId`, `familySize`, `hasChildren`, `hasElderly`, `allowsCurryTwoDays`, `eatsBreakfastBread`, `eatsGranolaOrCereal`, `wantsRestDays`, `usesFrozenFoods`, `usesPreparedFoods`, `allergies`, `createdAt`, `updatedAt`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING `id` AS `id`, `userId` AS `userId`, `familySize` AS `familySize`, `hasChildren` AS `hasChildren`, `hasElderly` AS `hasElderly`, `allowsCurryTwoDays` AS `allowsCurryTwoDays`, `eatsBreakfastBread` AS `eatsBreakfastBread`, `eatsGranolaOrCereal` AS `eatsGranolaOrCereal`, `wantsRestDays` AS `wantsRestDays`, `usesFrozenFoods` AS `usesFrozenFoods`, `usesPreparedFoods` AS `usesPreparedFoods`, `allergies` AS `allergies`, `createdAt` AS `createdAt`, `updatedAt` AS `updatedAt`
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].userPreferences.create()` invocation in
+/home/kopetan/research/kondate/meal-planner-app/meal-planner-app/.next/server/chunks/[root-of-the-server]__722d97f1._.js:116:174
+
+  113 });
+  114 // ユーザー設定が存在しない場合はデフォルト設定を作成
+  115 if (!preferences) {
+→ 116     preferences = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].userPreferences.create(
+Foreign key constraint violated on the foreign key
+献立生成中のエラー: Error [PrismaClientKnownRequestError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].userPreferences.create()` invocation in
+/home/kopetan/research/kondate/meal-planner-app/meal-planner-app/.next/server/chunks/[root-of-the-server]__722d97f1._.js:116:174
+
+  113 });
+  114 // ユーザー設定が存在しない場合はデフォルト設定を作成
+  115 if (!preferences) {
+→ 116     preferences = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].userPreferences.create(
+Foreign key constraint violated on the foreign key
+    at <unknown> (src/lib/meal-generator.ts:22:49)
+    at async MealGenerator.getUserPreferences (src/lib/meal-generator.ts:22:20)
+    at async MealGenerator.generateWeeklyMealPlan (src/lib/meal-generator.ts:147:26)
+    at async POST (src/app/api/meal-plan/generate/route.ts:28:23)
+  20 |     // ユーザー設定が存在しない場合はデフォルト設定を作成
+  21 |     if (!preferences) {
+> 22 |       preferences = await prisma.userPreferences.create({
+     |                                                 ^
+  23 |         data: {
+  24 |           userId,
+  25 |           familySize: 2, {
+  code: 'P2003',
+  meta: [Object],
+  clientVersion: '6.13.0'
+}
+Error generating meal plan: Error [PrismaClientKnownRequestError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].userPreferences.create()` invocation in
+/home/kopetan/research/kondate/meal-planner-app/meal-planner-app/.next/server/chunks/[root-of-the-server]__722d97f1._.js:116:174
+
+  113 });
+  114 // ユーザー設定が存在しない場合はデフォルト設定を作成
+  115 if (!preferences) {
+→ 116     preferences = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].userPreferences.create(
+Foreign key constraint violated on the foreign key
+    at <unknown> (src/lib/meal-generator.ts:22:49)
+    at async MealGenerator.getUserPreferences (src/lib/meal-generator.ts:22:20)
+    at async MealGenerator.generateWeeklyMealPlan (src/lib/meal-generator.ts:147:26)
+    at async POST (src/app/api/meal-plan/generate/route.ts:28:23)
+  20 |     // ユーザー設定が存在しない場合はデフォルト設定を作成
+  21 |     if (!preferences) {
+> 22 |       preferences = await prisma.userPreferences.create({
+     |                                                 ^
+  23 |         data: {
+  24 |           userId,
+  25 |           familySize: 2, {
+  code: 'P2003',
+  meta: [Object],
+  clientVersion: '6.13.0'
+}
+ POST /api/meal-plan/generate 500 in 317ms
+prisma:query SELECT 1
+prisma:query SELECT `main`.`user_preferences`.`id`, `main`.`user_preferences`.`userId`, `main`.`user_preferences`.`familySize`, `main`.`user_preferences`.`hasChildren`, `main`.`user_preferences`.`hasElderly`, `main`.`user_preferences`.`allowsCurryTwoDays`, `main`.`user_preferences`.`eatsBreakfastBread`, `main`.`user_preferences`.`eatsGranolaOrCereal`, `main`.`user_preferences`.`wantsRestDays`, `main`.`user_preferences`.`usesFrozenFoods`, `main`.`user_preferences`.`usesPreparedFoods`, `main`.`user_preferences`.`allergies`, `main`.`user_preferences`.`createdAt`, `main`.`user_preferences`.`updatedAt` FROM `main`.`user_preferences` WHERE (`main`.`user_preferences`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query INSERT INTO `main`.`user_preferences` (`id`, `userId`, `familySize`, `hasChildren`, `hasElderly`, `allowsCurryTwoDays`, `eatsBreakfastBread`, `eatsGranolaOrCereal`, `wantsRestDays`, `usesFrozenFoods`, `usesPreparedFoods`, `allergies`, `createdAt`, `updatedAt`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING `id` AS `id`, `userId` AS `userId`, `familySize` AS `familySize`, `hasChildren` AS `hasChildren`, `hasElderly` AS `hasElderly`, `allowsCurryTwoDays` AS `allowsCurryTwoDays`, `eatsBreakfastBread` AS `eatsBreakfastBread`, `eatsGranolaOrCereal` AS `eatsGranolaOrCereal`, `wantsRestDays` AS `wantsRestDays`, `usesFrozenFoods` AS `usesFrozenFoods`, `usesPreparedFoods` AS `usesPreparedFoods`, `allergies` AS `allergies`, `createdAt` AS `createdAt`, `updatedAt` AS `updatedAt`
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].userPreferences.create()` invocation in
+/home/kopetan/research/kondate/meal-planner-app/meal-planner-app/.next/server/chunks/[root-of-the-server]__722d97f1._.js:116:174
+
+  113 });
+  114 // ユーザー設定が存在しない場合はデフォルト設定を作成
+  115 if (!preferences) {
+→ 116     preferences = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].userPreferences.create(
+Foreign key constraint violated on the foreign key
+献立生成中のエラー: Error [PrismaClientKnownRequestError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].userPreferences.create()` invocation in
+/home/kopetan/research/kondate/meal-planner-app/meal-planner-app/.next/server/chunks/[root-of-the-server]__722d97f1._.js:116:174
+
+  113 });
+  114 // ユーザー設定が存在しない場合はデフォルト設定を作成
+  115 if (!preferences) {
+→ 116     preferences = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].userPreferences.create(
+Foreign key constraint violated on the foreign key
+    at <unknown> (src/lib/meal-generator.ts:22:49)
+    at async MealGenerator.getUserPreferences (src/lib/meal-generator.ts:22:20)
+    at async MealGenerator.generateWeeklyMealPlan (src/lib/meal-generator.ts:147:26)
+    at async POST (src/app/api/meal-plan/generate/route.ts:28:23)
+  20 |     // ユーザー設定が存在しない場合はデフォルト設定を作成
+  21 |     if (!preferences) {
+> 22 |       preferences = await prisma.userPreferences.create({
+     |                                                 ^
+  23 |         data: {
+  24 |           userId,
+  25 |           familySize: 2, {
+  code: 'P2003',
+  meta: [Object],
+  clientVersion: '6.13.0'
+}
+Error generating meal plan: Error [PrismaClientKnownRequestError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].userPreferences.create()` invocation in
+/home/kopetan/research/kondate/meal-planner-app/meal-planner-app/.next/server/chunks/[root-of-the-server]__722d97f1._.js:116:174
+
+  113 });
+  114 // ユーザー設定が存在しない場合はデフォルト設定を作成
+  115 if (!preferences) {
+→ 116     preferences = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].userPreferences.create(
+Foreign key constraint violated on the foreign key
+    at <unknown> (src/lib/meal-generator.ts:22:49)
+    at async MealGenerator.getUserPreferences (src/lib/meal-generator.ts:22:20)
+    at async MealGenerator.generateWeeklyMealPlan (src/lib/meal-generator.ts:147:26)
+    at async POST (src/app/api/meal-plan/generate/route.ts:28:23)
+  20 |     // ユーザー設定が存在しない場合はデフォルト設定を作成
+  21 |     if (!preferences) {
+> 22 |       preferences = await prisma.userPreferences.create({
+     |                                                 ^
+  23 |         data: {
+  24 |           userId,
+  25 |           familySize: 2, {
+  code: 'P2003',
+  meta: [Object],
+  clientVersion: '6.13.0'
+}
+ POST /api/meal-plan/generate 500 in 178ms

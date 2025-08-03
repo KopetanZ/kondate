@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { validateString, validatePassword, ValidationException, handleValidationError } from '@/lib/validation'
 
 export async function POST(request: NextRequest) {
   try {
-    const { familyName, password } = await request.json()
-
-    if (!familyName || !password) {
-      return NextResponse.json(
-        { error: 'familyName and password are required' },
-        { status: 400 }
-      )
-    }
+    const body = await request.json()
+    
+    // Validate input using the validation system
+    const familyName = validateString(body.familyName, 'familyName', { minLength: 1, maxLength: 50 })
+    const password = validatePassword(body.password)
 
     // ユーザーを検索
     const user = await prisma.user.findUnique({
@@ -45,6 +43,14 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Login error:', error)
+    
+    if (error instanceof ValidationException) {
+      return NextResponse.json(
+        handleValidationError(error),
+        { status: 400 }
+      )
+    }
+    
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }

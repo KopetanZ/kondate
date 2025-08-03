@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -50,7 +50,7 @@ export default function RecipeSelectionDialog({
     dinner: '夕食'
   }
 
-  const fetchRecipes = async () => {
+  const fetchRecipes = useCallback(async () => {
     setLoading(true)
     try {
       console.log(`Fetching recipes for ${mealType}...`)
@@ -72,14 +72,14 @@ export default function RecipeSelectionDialog({
     } finally {
       setLoading(false)
     }
-  }
+  }, [mealType])
 
   useEffect(() => {
     if (open) {
       fetchRecipes()
       setSearchTerm('')
     }
-  }, [open, mealType])
+  }, [open, fetchRecipes])
 
   useEffect(() => {
     if (searchTerm) {

@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db'
 export async function POST(request: NextRequest) {
   let familyName: string | undefined
   let familyIcon: string | undefined
-  let password: any[] | undefined
+  let password: string[] | undefined
 
   try {
     const body = await request.json()

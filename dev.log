@@ -146,3 +146,7 @@ prisma:query SELECT `main`.`recipes`.`id`, `main`.`recipes`.`name`, `main`.`reci
 prisma:query SELECT `main`.`recipe_ingredients`.`id`, `main`.`recipe_ingredients`.`recipeId`, `main`.`recipe_ingredients`.`ingredientId`, `main`.`recipe_ingredients`.`quantity`, `main`.`recipe_ingredients`.`unit` FROM `main`.`recipe_ingredients` WHERE `main`.`recipe_ingredients`.`recipeId` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?) LIMIT ? OFFSET ?
 prisma:query SELECT `main`.`ingredients`.`id`, `main`.`ingredients`.`name`, `main`.`ingredients`.`category`, `main`.`ingredients`.`unit`, `main`.`ingredients`.`nutritionPer100g`, `main`.`ingredients`.`peakSeasons`, `main`.`ingredients`.`storageType`, `main`.`ingredients`.`shelfLife`, `main`.`ingredients`.`createdAt`, `main`.`ingredients`.`updatedAt` FROM `main`.`ingredients` WHERE `main`.`ingredients`.`id` IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) LIMIT ? OFFSET ?
  GET /api/recipes?limit=5 200 in 27ms
+   Reload env: .env
+   Reload env: .env
+   Reload env: .env
+[?25h

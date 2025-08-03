@@ -57,3 +57,17 @@ prisma/*.db-journal
 
 # Prisma
 prisma/migrations/
+
+# Test files (temporary)
+test-*.js
+test-*.html
+fix-*.sql
+
+# Scraped data (contains potentially sensitive information)
+scraped-data/
+scraped-menus*.json
+
+# API credentials and sensitive data
+.env.local
+.env.production
+.env.production.local

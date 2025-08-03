@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Calendar, ChefHat, ShoppingCart, Settings, Plus, Loader2 } from 'lucide-react'
@@ -70,7 +70,7 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
     setCurrentWeek(newDate)
   }
 
-  const fetchMealPlans = async (weekStart: Date) => {
+  const fetchMealPlans = useCallback(async (weekStart: Date) => {
     setLoading(true)
     try {
       const response = await fetch(`/api/meal-plan?userId=${currentUser.id}&weekStartDate=${weekStart.toISOString()}`)
@@ -83,7 +83,7 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentUser.id])
 
   const generateMealPlan = async () => {
     setGenerating(true)
@@ -122,7 +122,7 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
   useEffect(() => {
     const weekStart = getWeekStartDate(currentWeek)
     fetchMealPlans(weekStart)
-  }, [currentWeek])
+  }, [currentWeek, fetchMealPlans])
 
   const getMealPlanForDate = (date: Date) => {
     const dateStr = date.toISOString().split('T')[0]

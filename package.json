@@ -11,6 +11,8 @@
     "seed:production": "tsx scripts/seed-production.ts",
     "seed:users": "tsx scripts/seed-users.ts",
     "scrape:twitter": "tsx scripts/import-scraped-menus.ts",
+    "scrape:mass": "tsx scripts/mass-scrape-sense-kabu.ts",
+    "import:mass-scraped": "tsx scripts/import-mass-scraped-data.ts",
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",

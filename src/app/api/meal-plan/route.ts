@@ -73,7 +73,14 @@ export async function GET(request: NextRequest) {
     })
 
     // 日付でグループ化
-    const plansByDate: Record<string, any> = {}
+    const plansByDate: Record<string, {
+      date: string;
+      breakfast: any;
+      lunch: any;
+      dinner: any;
+      userRating?: number;
+      notes?: string;
+    }> = {}
     
     // 週の全ての日付を初期化
     for (let i = 0; i < 7; i++) {
@@ -142,7 +149,13 @@ export async function PUT(request: NextRequest) {
     const planDate = new Date(date)
     
     // 既存の献立を更新または作成
-    const updateData: any = {}
+    const updateData: {
+      breakfastId?: string | null;
+      lunchId?: string | null;
+      dinnerId?: string | null;
+      userRating?: number;
+      notes?: string;
+    } = {}
     if (mealType === 'breakfast') updateData.breakfastId = recipeId
     if (mealType === 'lunch') updateData.lunchId = recipeId
     if (mealType === 'dinner') updateData.dinnerId = recipeId

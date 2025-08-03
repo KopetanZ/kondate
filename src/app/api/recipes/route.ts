@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search')
     const tags = searchParams.get('tags')?.split(',').filter(Boolean)
 
-    let whereClause: any = {}
+    const whereClause: Record<string, any> = {}
 
     // カテゴリフィルター
     if (category) {
@@ -53,13 +53,13 @@ export async function GET(request: NextRequest) {
 
       try {
         tags = typeof recipe.tags === 'string' ? JSON.parse(recipe.tags) : recipe.tags || []
-      } catch (e) {
+      } catch {
         tags = []
       }
 
       try {
         nutrition = typeof recipe.nutrition === 'string' ? JSON.parse(recipe.nutrition) : recipe.nutrition || nutrition
-      } catch (e) {
+      } catch {
         nutrition = { calories: 0, protein: 0, fat: 0, carbs: 0 }
       }
 

@@ -132,6 +132,85 @@ export class MealGenerator {
     return availableRecipes[randomIndex]
   }
 
+  private isCurryRecipe(recipe: any): boolean {
+    if (!recipe) return false
+    const tags = Array.isArray(recipe.tags) ? recipe.tags : JSON.parse(recipe.tags || '[]')
+    return tags.includes('カレー') || recipe.name.includes('カレー')
+  }
+
+  private async getCurryArrangementRecipe(previousCurryType: string): Promise<any | null> {
+    // カレーアレンジレシピをデータベースから検索
+    const arrangementRecipes = await prisma.recipe.findMany({
+      where: {
+        OR: [
+          { name: { contains: 'カレーうどん' } },
+          { name: { contains: 'カレードリア' } },
+          { tags: { contains: 'カレーアレンジ' } },
+          { tags: { contains: 'リメイク' } }
+        ]
+      },
+      include: {
+        ingredients: {
+          include: {
+            ingredient: true
+          }
+        }
+      }
+    })
+
+    if (arrangementRecipes.length === 0) {
+      // フォールバック: モックアレンジレシピを返す
+      return {
+        id: `curry-arrangement-${Date.now()}`,
+        name: 'カレーうどん（残りカレー使用）',
+        category: 'lunch',
+        isArrangement: true,
+        baseRecipe: previousCurryType,
+        cookingTime: 15,
+        difficulty: 1,
+        servings: 2,
+        tags: JSON.stringify(['和食', 'うどん', 'カレーアレンジ', 'リメイク']),
+        nutrition: JSON.stringify({
+          calories: 380,
+          protein: 12.5,
+          fat: 8.2,
+          carbohydrates: 68.0,
+          fiber: 2.5,
+          sodium: 800
+        })
+      }
+    }
+    
+    return arrangementRecipes[Math.floor(Math.random() * arrangementRecipes.length)]
+  }
+
+  private async findBestRecipeMatch(
+    recipes: any[], 
+    preferences: any, 
+    dayIndex: number, 
+    previousDayPlan: any,
+    mealType: MealType
+  ): Promise<any | null> {
+    if (!recipes || recipes.length === 0) return null
+    
+    // カレー2日連続対応
+    if (preferences.allowsCurryTwoDays && previousDayPlan && dayIndex > 0) {
+      const previousDinner = previousDayPlan.dinner
+      if (this.isCurryRecipe(previousDinner)) {
+        // 前日がカレーの場合、30%の確率でアレンジレシピを提案
+        if (Math.random() < 0.3 && (mealType === MealType.lunch || mealType === MealType.dinner)) {
+          const arrangement = await this.getCurryArrangementRecipe(previousDinner.name)
+          if (arrangement) {
+            console.log(`カレーアレンジレシピを提案: ${arrangement.name}`)
+            return arrangement
+          }
+        }
+      }
+    }
+    
+    return this.selectRandomRecipe(recipes)
+  }
+
   async generateWeeklyMealPlan(options: MealGenerationOptions): Promise<any> {
     const {
       userId,
@@ -159,14 +238,17 @@ export class MealGenerator {
       const generatedPlans: any[] = []
       const usedRecipeIds: string[] = []
 
-      // 各日の献立を生成
-      for (const date of weekDates) {
+      // 各日の献立を生成（カレー連続対応版）
+      for (let dayIndex = 0; dayIndex < weekDates.length; dayIndex++) {
+        const date = weekDates[dayIndex]
         const dayPlan: any = {
           date,
           breakfast: null,
           lunch: null,
           dinner: null
         }
+
+        const previousDayPlan = dayIndex > 0 ? generatedPlans[dayIndex - 1] : null
 
         // 朝食生成
         if (preferences.eatsBreakfastBread || preferences.eatsGranolaOrCereal) {
@@ -177,15 +259,20 @@ export class MealGenerator {
             excludeRecipeIds: [...recentRecipeIds, ...usedRecipeIds]
           })
           
-          const breakfast = this.selectRandomRecipe(breakfastRecipes)
+          const breakfast = await this.findBestRecipeMatch(
+            breakfastRecipes, preferences, dayIndex, previousDayPlan, MealType.breakfast
+          ) || this.selectRandomRecipe(breakfastRecipes)
+          
           if (breakfast) {
             dayPlan.breakfast = breakfast
-            usedRecipeIds.push(breakfast.id)
+            if (breakfast.id && !breakfast.isArrangement) {
+              usedRecipeIds.push(breakfast.id)
+            }
           }
         }
 
-        // 昼食生成
-        const lunchRecipes = await this.getFilteredRecipes({
+        // 昼食生成（カレーアレンジ優先）
+        let lunchRecipes = await this.getFilteredRecipes({
           mealType: MealType.lunch,
           season: currentSeason,
           allergies: preferences.allergies,
@@ -193,9 +280,8 @@ export class MealGenerator {
         })
 
         // 昼食がない場合は夕食から選択
-        let lunchCandidates = lunchRecipes
-        if (lunchCandidates.length === 0) {
-          lunchCandidates = await this.getFilteredRecipes({
+        if (lunchRecipes.length === 0) {
+          lunchRecipes = await this.getFilteredRecipes({
             mealType: MealType.dinner,
             season: currentSeason,
             allergies: preferences.allergies,
@@ -203,24 +289,74 @@ export class MealGenerator {
           })
         }
 
-        const lunch = this.selectRandomRecipe(lunchCandidates)
+        const lunch = await this.findBestRecipeMatch(
+          lunchRecipes, preferences, dayIndex, previousDayPlan, MealType.lunch
+        ) || this.selectRandomRecipe(lunchRecipes)
+        
         if (lunch) {
           dayPlan.lunch = lunch
-          usedRecipeIds.push(lunch.id)
+          if (lunch.id && !lunch.isArrangement) {
+            usedRecipeIds.push(lunch.id)
+          }
         }
 
-        // 夕食生成
-        const dinnerRecipes = await this.getFilteredRecipes({
+        // 夕食生成（フォールバック機能付き）
+        let dinnerRecipes = await this.getFilteredRecipes({
           mealType: MealType.dinner,
           season: currentSeason,
           allergies: preferences.allergies,
           excludeRecipeIds: [...recentRecipeIds, ...usedRecipeIds]
         })
 
-        const dinner = this.selectRandomRecipe(dinnerRecipes)
+        // フォールバック: レシピが不足している場合は条件を緩和
+        if (dinnerRecipes.length === 0) {
+          console.log('夕食レシピ不足のため除外条件を緩和します')
+          dinnerRecipes = await this.getFilteredRecipes({
+            mealType: MealType.dinner,
+            season: currentSeason,
+            allergies: preferences.allergies,
+            excludeRecipeIds: recentRecipeIds // 当週重複のみ除外
+          })
+        }
+
+        // さらなるフォールバック: 季節を無視
+        if (dinnerRecipes.length === 0) {
+          console.log('夕食レシピ不足のため季節条件も緩和します')
+          dinnerRecipes = await this.getFilteredRecipes({
+            mealType: MealType.dinner,
+            allergies: preferences.allergies,
+            excludeRecipeIds: []
+          })
+        }
+
+        const dinner = await this.findBestRecipeMatch(
+          dinnerRecipes, preferences, dayIndex, previousDayPlan, MealType.dinner
+        ) || this.selectRandomRecipe(dinnerRecipes)
+        
         if (dinner) {
           dayPlan.dinner = dinner
-          usedRecipeIds.push(dinner.id)
+          if (dinner.id && !dinner.isArrangement) {
+            usedRecipeIds.push(dinner.id)
+          }
+        } else {
+          // 最終フォールバック: デフォルト料理を提案
+          dayPlan.dinner = {
+            id: `fallback-dinner-${dayIndex}`,
+            name: '簡単炒め物',
+            category: 'dinner',
+            isFallback: true,
+            cookingTime: 15,
+            difficulty: 1,
+            servings: preferences.familySize,
+            tags: JSON.stringify(['簡単料理', 'フォールバック']),
+            nutrition: JSON.stringify({
+              calories: 300,
+              protein: 15,
+              fat: 12,
+              carbohydrates: 25,
+              fiber: 3
+            })
+          }
         }
 
         generatedPlans.push(dayPlan)

@@ -445,6 +445,174 @@ const recipes = [
     ingredients: [
       { name: 'パン', quantity: 100, unit: 'g' }
     ]
+  },
+
+  // カレー系レシピとアレンジ
+  {
+    name: 'ビーフカレー',
+    category: MealType.dinner,
+    cookingTime: 60,
+    difficulty: 2,
+    servings: 4,
+    instructions: JSON.stringify([
+      '牛肉を一口大に切る',
+      'じゃがいも、にんじん、玉ねぎを一口大に切る',
+      '鍋に油を熱し、牛肉を炒める',
+      '野菜を加えて炒める',
+      '水を加えて20分煮込む',
+      'カレールーを加えて10分煮込む',
+      'ご飯と一緒に盛り付けて完成'
+    ]),
+    nutrition: JSON.stringify({
+      calories: 450,
+      protein: 22.0,
+      fat: 18.5,
+      carbohydrates: 58.0,
+      fiber: 3.8,
+      sodium: 950,
+      calcium: 45,
+      iron: 2.8,
+      vitaminC: 20
+    }),
+    seasonality: JSON.stringify([Season.spring, Season.summer, Season.autumn, Season.winter]),
+    tags: JSON.stringify(['洋食', 'カレー', '人気料理']),
+    ingredients: [
+      { name: '牛こま切れ肉', quantity: 300, unit: 'g' },
+      { name: 'じゃがいも', quantity: 300, unit: 'g' },
+      { name: 'にんじん', quantity: 150, unit: 'g' },
+      { name: '玉ねぎ', quantity: 200, unit: 'g' },
+      { name: '米', quantity: 300, unit: 'g' }
+    ]
+  },
+  {
+    name: 'カレーうどん',
+    category: MealType.lunch,
+    cookingTime: 20,
+    difficulty: 1,
+    servings: 2,
+    instructions: JSON.stringify([
+      '冷凍うどんを茹でる',
+      '残ったカレーに水とだし汁を加えて薄める',
+      'カレースープを温める',
+      '茹でたうどんを器に盛る',
+      'カレースープをかけて完成'
+    ]),
+    nutrition: JSON.stringify({
+      calories: 380,
+      protein: 12.5,
+      fat: 8.2,
+      carbohydrates: 68.0,
+      fiber: 2.5,
+      sodium: 800,
+      calcium: 25,
+      iron: 1.5,
+      vitaminC: 8
+    }),
+    seasonality: JSON.stringify([Season.spring, Season.summer, Season.autumn, Season.winter]),
+    tags: JSON.stringify(['和食', 'うどん', 'カレーアレンジ', 'リメイク']),
+    ingredients: [
+      { name: '米', quantity: 50, unit: 'g' } // カレーの残りを想定
+    ]
+  },
+  {
+    name: 'カレードリア',
+    category: MealType.dinner,
+    cookingTime: 30,
+    difficulty: 2,
+    servings: 2,
+    instructions: JSON.stringify([
+      'ご飯を耐熱皿に盛る',
+      '残ったカレーをご飯の上にかける',
+      'ホワイトソースを作る',
+      'チーズとホワイトソースをのせる',
+      'オーブンで15分焼いて完成'
+    ]),
+    nutrition: JSON.stringify({
+      calories: 520,
+      protein: 18.8,
+      fat: 22.5,
+      carbohydrates: 65.0,
+      fiber: 2.8,
+      sodium: 1100,
+      calcium: 180,
+      iron: 2.2,
+      vitaminC: 12
+    }),
+    seasonality: JSON.stringify([Season.spring, Season.summer, Season.autumn, Season.winter]),
+    tags: JSON.stringify(['洋食', 'ドリア', 'カレーアレンジ', 'リメイク']),
+    ingredients: [
+      { name: '米', quantity: 200, unit: 'g' } // カレーの残りを想定
+    ]
+  },
+  {
+    name: 'チキンカレー',
+    category: MealType.dinner,
+    cookingTime: 45,
+    difficulty: 2,
+    servings: 4,
+    instructions: JSON.stringify([
+      '鶏もも肉を一口大に切る',
+      'じゃがいも、にんじん、玉ねぎを切る',
+      '鍋に油を熱し、鶏肉を炒める',
+      '野菜を加えて炒める',
+      '水を加えて煮込む',
+      'カレールーを加えて仕上げる'
+    ]),
+    nutrition: JSON.stringify({
+      calories: 420,
+      protein: 25.0,
+      fat: 16.8,
+      carbohydrates: 52.0,
+      fiber: 3.5,
+      sodium: 900,
+      calcium: 40,
+      iron: 2.5,
+      vitaminC: 18
+    }),
+    seasonality: JSON.stringify([Season.spring, Season.summer, Season.autumn, Season.winter]),
+    tags: JSON.stringify(['洋食', 'カレー', 'チキン']),
+    ingredients: [
+      { name: '鶏もも肉', quantity: 300, unit: 'g' },
+      { name: 'じゃがいも', quantity: 300, unit: 'g' },
+      { name: 'にんじん', quantity: 150, unit: 'g' },
+      { name: '玉ねぎ', quantity: 200, unit: 'g' },
+      { name: '米', quantity: 300, unit: 'g' }
+    ]
+  },
+  {
+    name: 'ポークカレー',
+    category: MealType.dinner,
+    cookingTime: 50,
+    difficulty: 2,
+    servings: 4,
+    instructions: JSON.stringify([
+      '豚バラ肉を一口大に切る',
+      '野菜を切る',
+      '鍋で豚肉を炒める',
+      '野菜を加えて炒める',
+      '水を加えて煮込む',
+      'カレールーで味付けする'
+    ]),
+    nutrition: JSON.stringify({
+      calories: 480,
+      protein: 20.5,
+      fat: 22.0,
+      carbohydrates: 55.0,
+      fiber: 3.2,
+      sodium: 920,
+      calcium: 38,
+      iron: 2.8,
+      vitaminC: 15
+    }),
+    seasonality: JSON.stringify([Season.spring, Season.summer, Season.autumn, Season.winter]),
+    tags: JSON.stringify(['洋食', 'カレー', 'ポーク']),
+    ingredients: [
+      { name: '豚バラ肉', quantity: 300, unit: 'g' },
+      { name: 'じゃがいも', quantity: 300, unit: 'g' },
+      { name: 'にんじん', quantity: 150, unit: 'g' },
+      { name: '玉ねぎ', quantity: 200, unit: 'g' },
+      { name: '米', quantity: 300, unit: 'g' }
+    ]
   }
 ]
 

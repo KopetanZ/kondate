@@ -104,8 +104,8 @@ export async function GET(request: NextRequest) {
           breakfast: plan.breakfast,
           lunch: plan.lunch,
           dinner: plan.dinner,
-          userRating: plan.userRating,
-          notes: plan.notes
+          userRating: plan.userRating ?? undefined,
+          notes: plan.notes ?? undefined
         }
       }
     })

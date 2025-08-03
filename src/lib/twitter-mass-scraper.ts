@@ -81,7 +81,7 @@ export class TwitterMassScraper {
   async initialize() {
     console.log('🚀 ブラウザを初期化中...')
     this.browser = await puppeteer.launch({
-      headless: 'new',
+      headless: true,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',

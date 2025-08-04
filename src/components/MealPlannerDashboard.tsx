@@ -89,7 +89,7 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
     setGenerating(true)
     try {
       const weekStart = getWeekStartDate(currentWeek)
-      const response = await fetch('/api/meal-plan/generate', {
+      const response = await fetch('/api/meal-plan/generate-optimized', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -4,8 +4,16 @@
   "installCommand": "npm install",
   "framework": "nextjs",
   "functions": {
+    "src/app/api/meal-plan/generate-optimized/*.ts": {
+      "maxDuration": 10,
+      "memory": 1024
+    },
+    "src/app/api/meal-plan/generate/*.ts": {
+      "maxDuration": 10,
+      "memory": 1024
+    },
     "src/app/api/**/*.ts": {
-      "maxDuration": 30
+      "maxDuration": 15
     }
   },
   "env": {

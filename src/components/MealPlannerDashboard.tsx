@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Calendar, ChefHat, ShoppingCart, Settings, Plus, Loader2 } from 'lucide-react'
 import ShoppingList from './ShoppingList'
 import RecipeSelectionDialog from './RecipeSelectionDialog'
+import NutritionBalance from './NutritionBalance'
 
 interface Recipe {
   id: string
@@ -34,6 +35,8 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
   const [generating, setGenerating] = useState(false)
   const [showShoppingList, setShowShoppingList] = useState(false)
   const [shoppingListWeekStart, setShoppingListWeekStart] = useState<Date | null>(null)
+  const [showNutritionBalance, setShowNutritionBalance] = useState(false)
+  const [nutritionWeekStart, setNutritionWeekStart] = useState<Date | null>(null)
   const [showRecipeDialog, setShowRecipeDialog] = useState(false)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selectedMealType, setSelectedMealType] = useState<'breakfast' | 'lunch' | 'dinner'>('breakfast')
@@ -170,6 +173,12 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
     setShowShoppingList(true)
   }
 
+  const showNutritionAnalysis = () => {
+    const weekStart = getWeekStartDate(currentWeek)
+    setNutritionWeekStart(weekStart)
+    setShowNutritionBalance(true)
+  }
+
   const openRecipeDialog = (date: Date, mealType: 'breakfast' | 'lunch' | 'dinner') => {
     setSelectedDate(date.toISOString())
     setSelectedMealType(mealType)
@@ -211,6 +220,19 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
         onBack={() => {
           setShowShoppingList(false)
           setShoppingListWeekStart(null)
+        }}
+      />
+    )
+  }
+
+  if (showNutritionBalance) {
+    return (
+      <NutritionBalance
+        weekStartDate={nutritionWeekStart?.toISOString() || ''}
+        userId={currentUser.id}
+        onBack={() => {
+          setShowNutritionBalance(false)
+          setNutritionWeekStart(null)
         }}
       />
     )
@@ -500,7 +522,11 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={showNutritionAnalysis}
+              >
                 確認する
               </Button>
             </CardContent>

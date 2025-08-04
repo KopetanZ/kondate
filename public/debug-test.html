@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>献立生成デバッグ</title>
+    <style>
+        body { font-family: 'Hiragino Sans', Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .result { margin-top: 10px; padding: 15px; background: #f5f5f5; border-radius: 4px; white-space: pre-wrap; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .loading { color: #666; }
+        .timing { font-weight: bold; color: #1976d2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍽️ 献立生成機能デバッグツール</h1>
+        
+        <div class="test-section">
+            <h2>1. 単日献立生成テスト</h2>
+            <p>今日の日付で1日分の献立を生成してデバッグ情報を取得します</p>
+            <button onclick="testSingleDayGeneration()">単日生成テスト実行</button>
+            <div id="singleDayResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>2. レシピ数確認テスト</h2>
+            <p>各食事タイプのレシピ数を確認します</p>
+            <button onclick="testRecipeCount()">レシピ数確認</button>
+            <div id="recipeCountResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. 週間献立生成テスト</h2>
+            <p>従来の週間生成APIをテストします</p>
+            <button onclick="testWeeklyGeneration()">週間生成テスト実行</button>
+            <div id="weeklyResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>4. データベース接続テスト</h2>
+            <p>データベースの接続とレシピ取得をテストします</p>
+            <button onclick="testDatabaseConnection()">DB接続テスト</button>
+            <div id="dbResult" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        function showResult(elementId, content, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result ${isSuccess ? 'success' : 'error'}`;
+            element.textContent = content;
+        }
+
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = 'result loading';
+            element.textContent = '⏳ 処理中...';
+        }
+
+        async function testSingleDayGeneration() {
+            showLoading('singleDayResult');
+            const startTime = Date.now();
+            
+            try {
+                const response = await fetch('/api/meal-plan/debug-single-day', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: 'demo-user',
+                        targetDate: new Date().toISOString().split('T')[0]
+                    })
+                });
+
+                const data = await response.json();
+                const totalTime = Date.now() - startTime;
+
+                let result = `⏱️ API呼び出し時間: ${totalTime}ms\n`;
+                result += `📊 レスポンス: ${response.ok ? '✅ 成功' : '❌ 失敗'}\n\n`;
+                
+                if (data.success) {
+                    result += `🎯 生成結果:\n`;
+                    result += `朝食: ${data.data.breakfast?.name || '❌ なし'}\n`;
+                    result += `昼食: ${data.data.lunch?.name || '❌ なし'}\n`;
+                    result += `夕食: ${data.data.dinner?.name || '❌ なし'}\n\n`;
+                    
+                    if (data.data.debug) {
+                        result += `🔍 デバッグ情報:\n`;
+                        result += `ユーザー設定: ${JSON.stringify(data.data.debug.preferences, null, 2)}\n`;
+                        result += `最近のレシピ数: ${data.data.debug.recentRecipeIds?.length || 0}\n`;
+                        result += `処理時間詳細: ${JSON.stringify(data.data.debug.timings, null, 2)}\n`;
+                    }
+                } else {
+                    result += `❌ エラー: ${data.error}\n`;
+                    result += `詳細: ${data.details}\n`;
+                }
+                
+                showResult('singleDayResult', result, data.success);
+            } catch (error) {
+                showResult('singleDayResult', `❌ ネットワークエラー: ${error.message}`, false);
+            }
+        }
+
+        async function testRecipeCount() {
+            showLoading('recipeCountResult');
+            
+            try {
+                const response = await fetch('/api/recipes');
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'レシピ取得に失敗しました');
+                }
+                
+                const recipes = data.recipes || [];
+                
+                const counts = {
+                    breakfast: recipes.filter(r => r.category === 'breakfast').length,
+                    lunch: recipes.filter(r => r.category === 'lunch').length,
+                    dinner: recipes.filter(r => r.category === 'dinner').length,
+                    total: recipes.length
+                };
+                
+                let result = `📊 レシピ数統計:\n`;
+                result += `朝食: ${counts.breakfast}件\n`;
+                result += `昼食: ${counts.lunch}件\n`;
+                result += `夕食: ${counts.dinner}件\n`;
+                result += `合計: ${counts.total}件\n\n`;
+                
+                if (counts.total === 0) {
+                    result += `⚠️ レシピが1件もありません。シードデータを確認してください。`;
+                } else if (counts.breakfast === 0 || counts.lunch === 0 || counts.dinner === 0) {
+                    result += `⚠️ 一部の食事タイプでレシピが不足しています。`;
+                } else {
+                    result += `✅ すべての食事タイプでレシピが利用可能です。`;
+                }
+                
+                showResult('recipeCountResult', result, counts.total > 0);
+            } catch (error) {
+                showResult('recipeCountResult', `❌ レシピ取得エラー: ${error.message}`, false);
+            }
+        }
+
+        async function testWeeklyGeneration() {
+            showLoading('weeklyResult');
+            const startTime = Date.now();
+            
+            try {
+                const weekStartDate = new Date();
+                weekStartDate.setDate(weekStartDate.getDate() - weekStartDate.getDay());
+                
+                const response = await fetch('/api/meal-plan/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: 'demo-user',
+                        weekStartDate: weekStartDate.toISOString()
+                    })
+                });
+
+                const data = await response.json();
+                const totalTime = Date.now() - startTime;
+
+                let result = `⏱️ 週間生成時間: ${totalTime}ms\n`;
+                result += `📊 レスポンス: ${response.ok ? '✅ 成功' : '❌ 失敗'}\n\n`;
+                
+                if (data.success && data.data.plans) {
+                    result += `📅 生成された献立数: ${data.data.plans.length}日分\n\n`;
+                    data.data.plans.forEach((plan, index) => {
+                        const date = new Date(plan.date).toLocaleDateString('ja-JP');
+                        result += `${index + 1}日目 (${date}):\n`;
+                        result += `  朝食: ${plan.breakfast?.name || '❌ なし'}\n`;
+                        result += `  昼食: ${plan.lunch?.name || '❌ なし'}\n`;
+                        result += `  夕食: ${plan.dinner?.name || '❌ なし'}\n\n`;
+                    });
+                } else {
+                    result += `❌ エラー: ${data.error || 'Unknown error'}\n`;
+                    if (data.details) result += `詳細: ${data.details}\n`;
+                }
+                
+                showResult('weeklyResult', result, data.success);
+            } catch (error) {
+                showResult('weeklyResult', `❌ ネットワークエラー: ${error.message}`, false);
+            }
+        }
+
+        async function testDatabaseConnection() {
+            showLoading('dbResult');
+            
+            try {
+                const response = await fetch('/api/health');
+                const health = await response.json();
+                
+                let result = `🏥 ヘルスチェック: ${response.ok ? '✅ OK' : '❌ NG'}\n`;
+                result += `データベース: ${health.database ? '✅ 接続済み' : '❌ 接続失敗'}\n`;
+                result += `アプリ: ${health.status}\n`;
+                result += `タイムスタンプ: ${health.timestamp}\n`;
+                
+                showResult('dbResult', result, response.ok && health.database);
+            } catch (error) {
+                showResult('dbResult', `❌ ヘルスチェックエラー: ${error.message}`, false);
+            }
+        }
+
+        // ページ読み込み時に基本情報を表示
+        window.addEventListener('load', () => {
+            console.log('🚀 献立生成デバッグツール読み込み完了');
+            console.log('📍 現在のURL:', window.location.href);
+        });
+    </script>
+</body>
+</html>

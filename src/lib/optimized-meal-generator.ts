@@ -141,6 +141,7 @@ export class OptimizedMealGenerator {
   async generateWeeklyMealPlanOptimized(options: MealGenerationOptions): Promise<any> {
     const startTime = Date.now()
     console.log('🚀 最適化された献立生成開始')
+    console.log('📋 オプション:', options)
 
     const {
       userId,
@@ -152,11 +153,20 @@ export class OptimizedMealGenerator {
 
     try {
       // 🚀 並列処理: ユーザー設定・レシピ・履歴を同時取得
+      console.log('📊 データ取得開始...')
+      console.log('👤 ユーザー設定取得中...')
+      console.log('🍽️ レシピデータ取得中...')
+      console.log('📜 履歴データ取得中...')
+      
       const [preferences, recipesData, recentRecipeIds] = await Promise.all([
         this.getUserPreferences(userId),
         this.getAllRecipesOptimized(),
         avoidRecentMeals ? this.getRecentMealPlanIds(userId, recentMealsDays) : Promise.resolve([])
       ])
+      
+      console.log('✅ ユーザー設定:', preferences)
+      console.log('✅ レシピ数:', recipesData.recipes.length)
+      console.log('✅ 最近使用レシピID数:', recentRecipeIds.length)
 
       console.log(`📊 データ取得完了: ${Date.now() - startTime}ms`)
 

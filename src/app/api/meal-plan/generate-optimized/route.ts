@@ -11,6 +11,8 @@ export async function POST(request: NextRequest) {
     console.log('🚀 最適化献立生成API開始')
     
     const body = await request.json()
+    console.log('📝 リクエストボディ:', body)
+    
     const {
       userId = 'demo-user',
       weekStartDate,
@@ -18,6 +20,8 @@ export async function POST(request: NextRequest) {
       avoidRecentMeals = true,
       recentMealsDays = 14
     } = body
+
+    console.log('🔧 パラメータ:', { userId, weekStartDate, considerSeasonality, avoidRecentMeals, recentMealsDays })
 
     if (!weekStartDate) {
       return NextResponse.json(
@@ -29,9 +33,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    console.log('🏗️ OptimizedMealGeneratorインスタンスを作成中...')
     const generator = new OptimizedMealGenerator()
+    console.log('✅ OptimizedMealGeneratorインスタンス作成完了')
     
     // 🚀 最適化された献立生成
+    console.log('📊 献立生成開始...')
     const weeklyPlan = await generator.generateWeeklyMealPlanOptimized({
       userId,
       weekStartDate: new Date(weekStartDate),
@@ -43,7 +50,9 @@ export async function POST(request: NextRequest) {
     console.log(`⚡ 献立生成完了: ${weeklyPlan.totalTime}ms`)
 
     // 🚀 最適化された保存処理
+    console.log('💾 保存処理開始...')
     await generator.saveMealPlanOptimized(userId, weeklyPlan)
+    console.log('✅ 保存処理完了')
 
     const totalTime = Date.now() - startTime
     console.log(`🎉 API全体処理時間: ${totalTime}ms`)

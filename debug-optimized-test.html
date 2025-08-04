@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>最適化API デバッグテスト</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .test-button { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .test-button:hover { background: #0056b3; }
+        .result { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px; white-space: pre-wrap; font-family: monospace; max-height: 500px; overflow-y: auto; }
+        .error { background: #f8d7da; color: #721c24; }
+        .success { background: #d4edda; color: #155724; }
+        .loading { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 最適化API デバッグテスト</h1>
+        
+        <div class="test-section">
+            <h2>最適化された献立生成API テスト</h2>
+            <button class="test-button" onclick="testOptimizedGeneration()">週間献立生成（最適化版）</button>
+            <div id="optimized-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>データベース接続テスト</h2>
+            <button class="test-button" onclick="testDatabaseConnection()">データベース接続確認</button>
+            <div id="db-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>通常の単日デバッグAPI テスト（比較用）</h2>
+            <button class="test-button" onclick="testSingleDayDebug()">単日献立生成（デバッグ版）</button>
+            <div id="debug-result" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        async function testOptimizedGeneration() {
+            const resultDiv = document.getElementById('optimized-result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result loading';
+            resultDiv.textContent = '🔄 最適化された週間献立を生成中...';
+
+            const testData = {
+                userId: 'demo-user',
+                weekStartDate: new Date().toISOString(),
+                considerSeasonality: true,
+                avoidRecentMeals: true,
+                recentMealsDays: 14,
+                includeVariety: true,
+                maxSameCategoryPerWeek: 2
+            };
+
+            try {
+                console.log('📤 リクエスト送信:', testData);
+                const startTime = Date.now();
+                
+                const response = await fetch('/api/meal-plan/generate-optimized', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+
+                console.log('📥 レスポンス受信:', response.status, response.statusText);
+
+                const data = await response.json();
+                console.log('📋 レスポンスデータ:', data);
+
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ 最適化API成功！\\n\\n⏱️ レスポンス時間: ${responseTime}ms\\n\\n📊 結果:\\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ 最適化API失敗 (${response.status})\\n\\n⏱️ レスポンス時間: ${responseTime}ms\\n\\n📋 エラー詳細:\\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                console.error('❌ リクエストエラー:', error);
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ リクエストエラー\\n\\n詳細: ${error.message}\\n\\nスタック: ${error.stack}`;
+            }
+        }
+
+        async function testDatabaseConnection() {
+            const resultDiv = document.getElementById('db-result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result loading';
+            resultDiv.textContent = '🔄 データベース接続を確認中...';
+
+            try {
+                console.log('📤 データベース接続テスト送信');
+                const startTime = Date.now();
+                
+                const response = await fetch('/api/test-db', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+
+                console.log('📥 データベーステストレスポンス受信:', response.status, response.statusText);
+
+                const data = await response.json();
+                console.log('📋 データベーステストレスポンスデータ:', data);
+
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ データベース接続成功！\\n\\n⏱️ レスポンス時間: ${responseTime}ms\\n\\n📊 結果:\\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ データベース接続失敗 (${response.status})\\n\\n⏱️ レスポンス時間: ${responseTime}ms\\n\\n📋 エラー詳細:\\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                console.error('❌ データベーステストリクエストエラー:', error);
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ データベーステストリクエストエラー\\n\\n詳細: ${error.message}\\n\\nスタック: ${error.stack}`;
+            }
+        }
+
+        async function testSingleDayDebug() {
+            const resultDiv = document.getElementById('debug-result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result loading';
+            resultDiv.textContent = '🔄 単日献立デバッグを実行中...';
+
+            const testData = {
+                userId: 'demo-user',
+                targetDate: new Date().toISOString(),
+                considerSeasonality: true,
+                avoidRecentMeals: true
+            };
+
+            try {
+                console.log('📤 デバッグリクエスト送信:', testData);
+                const startTime = Date.now();
+                
+                const response = await fetch('/api/meal-plan/debug-single-day', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+
+                console.log('📥 デバッグレスポンス受信:', response.status, response.statusText);
+
+                const data = await response.json();
+                console.log('📋 デバッグレスポンスデータ:', data);
+
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ デバッグAPI成功！\\n\\n⏱️ レスポンス時間: ${responseTime}ms\\n\\n📊 結果:\\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ デバッグAPI失敗 (${response.status})\\n\\n⏱️ レスポンス時間: ${responseTime}ms\\n\\n📋 エラー詳細:\\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                console.error('❌ デバッグリクエストエラー:', error);
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ デバッグリクエストエラー\\n\\n詳細: ${error.message}\\n\\nスタック: ${error.stack}`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -219,3 +219,174 @@ prisma:query INSERT INTO "public"."meal_plans" ("id","userId","date","breakfastI
 🎉 API全体処理時間: 257ms
  POST /api/meal-plan/generate-optimized 200 in 326ms
 prisma:query COMMIT
+🔍 データベース接続テスト開始
+prisma:query SELECT COUNT(*) AS "_count._all" FROM (SELECT "public"."users"."id" FROM "public"."users" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) AS "_count._all" FROM (SELECT "public"."recipes"."id" FROM "public"."recipes" WHERE 1=1 OFFSET $1) AS "sub"
+✅ データベース接続成功
+👥 ユーザー数: 2
+🍽️ レシピ数: 166
+ GET /api/test-db 200 in 220ms
+ ✓ Compiled /api/meal-plan/generate-partial in 83ms
+🚀 部分的献立生成API開始
+📝 リクエストボディ: {
+  userId: 'demo-user',
+  weekStartDate: '2025-08-04T13:49:17.578Z',
+  mealType: 'breakfast',
+  considerSeasonality: true,
+  avoidRecentMeals: true,
+  recentMealsDays: 14
+}
+🔧 パラメータ: {
+  userId: 'demo-user',
+  weekStartDate: '2025-08-04T13:49:17.578Z',
+  mealType: 'breakfast',
+  considerSeasonality: true,
+  avoidRecentMeals: true,
+  recentMealsDays: 14
+}
+🏗️ OptimizedMealGeneratorインスタンスを作成中...
+✅ OptimizedMealGeneratorインスタンス作成完了
+📊 breakfast献立生成開始...
+🚀 breakfastのみの献立生成開始
+📋 オプション: {
+  userId: 'demo-user',
+  weekStartDate: 2025-08-04T13:49:17.578Z,
+  mealType: 'breakfast',
+  considerSeasonality: true,
+  avoidRecentMeals: true,
+  recentMealsDays: 14
+}
+📊 データ取得開始...
+prisma:query SELECT "public"."meal_plans"."id", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId" FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2) OFFSET $3
+prisma:query SELECT "public"."user_preferences"."id", "public"."user_preferences"."userId", "public"."user_preferences"."familySize", "public"."user_preferences"."hasChildren", "public"."user_preferences"."hasElderly", "public"."user_preferences"."allowsCurryTwoDays", "public"."user_preferences"."eatsBreakfastBread", "public"."user_preferences"."eatsGranolaOrCereal", "public"."user_preferences"."wantsRestDays", "public"."user_preferences"."usesFrozenFoods", "public"."user_preferences"."usesPreparedFoods", "public"."user_preferences"."allergies", "public"."user_preferences"."createdAt", "public"."user_preferences"."updatedAt" FROM "public"."user_preferences" WHERE ("public"."user_preferences"."userId" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."recipes"."id", "public"."recipes"."name", "public"."recipes"."category"::text, "public"."recipes"."cookingTime", "public"."recipes"."difficulty", "public"."recipes"."servings", "public"."recipes"."tags", "public"."recipes"."nutrition" FROM "public"."recipes" WHERE 1=1 OFFSET $1
+prisma:query SELECT "public"."recipe_ingredients"."id", "public"."recipe_ingredients"."ingredientId", "public"."recipe_ingredients"."recipeId" FROM "public"."recipe_ingredients" WHERE "public"."recipe_ingredients"."recipeId" IN ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52,$53,$54,$55,$56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66,$67,$68,$69,$70,$71,$72,$73,$74,$75,$76,$77,$78,$79,$80,$81,$82,$83,$84,$85,$86,$87,$88,$89,$90,$91,$92,$93,$94,$95,$96,$97,$98,$99,$100,$101,$102,$103,$104,$105,$106,$107,$108,$109,$110,$111,$112,$113,$114,$115,$116,$117,$118,$119,$120,$121,$122,$123,$124,$125,$126,$127,$128,$129,$130,$131,$132,$133,$134,$135,$136,$137,$138,$139,$140,$141,$142,$143,$144,$145,$146,$147,$148,$149,$150,$151,$152,$153,$154,$155,$156,$157,$158,$159,$160,$161,$162,$163,$164,$165,$166) OFFSET $167
+prisma:query SELECT "public"."ingredients"."id", "public"."ingredients"."name" FROM "public"."ingredients" WHERE "public"."ingredients"."id" IN ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52,$53,$54,$55,$56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66,$67,$68,$69) OFFSET $70
+✅ ユーザー設定: {
+  id: 'cmdx1uy0o000142pz2zpr9anz',
+  userId: 'demo-user',
+  familySize: 2,
+  hasChildren: false,
+  hasElderly: false,
+  allowsCurryTwoDays: true,
+  eatsBreakfastBread: true,
+  eatsGranolaOrCereal: false,
+  wantsRestDays: true,
+  usesFrozenFoods: true,
+  usesPreparedFoods: true,
+  allergies: [],
+  createdAt: 2025-08-04T11:51:27.672Z,
+  updatedAt: 2025-08-04T11:51:27.672Z
+}
+✅ レシピ数: 166
+✅ 最近使用レシピID数: 29
+📊 データ取得完了: 552ms
+🔍 breakfastフィルタリング完了: 27件
+⚡ breakfast献立生成完了: 553ms
+🎉 breakfast献立生成完了: 総処理時間 553ms
+⚡ breakfast献立生成完了: 553ms
+💾 部分保存処理開始...
+💾 breakfastの部分的保存開始...
+prisma:query BEGIN
+prisma:query SELECT "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt" FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2 AND "public"."meal_plans"."date" < $3) LIMIT $4 OFFSET $5
+prisma:query UPDATE "public"."meal_plans" SET "isGenerated" = $1, "generationSettings" = $2, "breakfastId" = $3, "updatedAt" = $4 WHERE ("public"."meal_plans"."id" = $5 AND 1=1) RETURNING "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt"
+prisma:query SELECT "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt" FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2 AND "public"."meal_plans"."date" < $3) LIMIT $4 OFFSET $5
+prisma:query UPDATE "public"."meal_plans" SET "isGenerated" = $1, "generationSettings" = $2, "breakfastId" = $3, "updatedAt" = $4 WHERE ("public"."meal_plans"."id" = $5 AND 1=1) RETURNING "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt"
+prisma:query SELECT "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt" FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2 AND "public"."meal_plans"."date" < $3) LIMIT $4 OFFSET $5
+prisma:query UPDATE "public"."meal_plans" SET "isGenerated" = $1, "generationSettings" = $2, "breakfastId" = $3, "updatedAt" = $4 WHERE ("public"."meal_plans"."id" = $5 AND 1=1) RETURNING "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt"
+prisma:query SELECT "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt" FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2 AND "public"."meal_plans"."date" < $3) LIMIT $4 OFFSET $5
+prisma:query UPDATE "public"."meal_plans" SET "isGenerated" = $1, "generationSettings" = $2, "breakfastId" = $3, "updatedAt" = $4 WHERE ("public"."meal_plans"."id" = $5 AND 1=1) RETURNING "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt"
+prisma:query SELECT "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt" FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2 AND "public"."meal_plans"."date" < $3) LIMIT $4 OFFSET $5
+prisma:query UPDATE "public"."meal_plans" SET "isGenerated" = $1, "generationSettings" = $2, "breakfastId" = $3, "updatedAt" = $4 WHERE ("public"."meal_plans"."id" = $5 AND 1=1) RETURNING "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt"
+prisma:query SELECT "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt" FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2 AND "public"."meal_plans"."date" < $3) LIMIT $4 OFFSET $5
+prisma:query UPDATE "public"."meal_plans" SET "isGenerated" = $1, "generationSettings" = $2, "breakfastId" = $3, "updatedAt" = $4 WHERE ("public"."meal_plans"."id" = $5 AND 1=1) RETURNING "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt"
+prisma:query SELECT "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt" FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2 AND "public"."meal_plans"."date" < $3) LIMIT $4 OFFSET $5
+prisma:query UPDATE "public"."meal_plans" SET "isGenerated" = $1, "generationSettings" = $2, "breakfastId" = $3, "updatedAt" = $4 WHERE ("public"."meal_plans"."id" = $5 AND 1=1) RETURNING "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt"
+💾 breakfastの部分的保存完了: 316ms
+✅ 部分保存処理完了
+🎉 API全体処理時間: 870ms
+ POST /api/meal-plan/generate-partial 200 in 1024ms
+prisma:query COMMIT
+🚀 部分的献立生成API開始
+📝 リクエストボディ: {
+  userId: 'demo-user',
+  weekStartDate: '2025-08-04T13:49:17.578Z',
+  mealType: 'dinner',
+  considerSeasonality: true,
+  avoidRecentMeals: true,
+  recentMealsDays: 14
+}
+🔧 パラメータ: {
+  userId: 'demo-user',
+  weekStartDate: '2025-08-04T13:49:17.578Z',
+  mealType: 'dinner',
+  considerSeasonality: true,
+  avoidRecentMeals: true,
+  recentMealsDays: 14
+}
+🏗️ OptimizedMealGeneratorインスタンスを作成中...
+✅ OptimizedMealGeneratorインスタンス作成完了
+📊 dinner献立生成開始...
+🚀 dinnerのみの献立生成開始
+📋 オプション: {
+  userId: 'demo-user',
+  weekStartDate: 2025-08-04T13:49:17.578Z,
+  mealType: 'dinner',
+  considerSeasonality: true,
+  avoidRecentMeals: true,
+  recentMealsDays: 14
+}
+📊 データ取得開始...
+prisma:query SELECT "public"."user_preferences"."id", "public"."user_preferences"."userId", "public"."user_preferences"."familySize", "public"."user_preferences"."hasChildren", "public"."user_preferences"."hasElderly", "public"."user_preferences"."allowsCurryTwoDays", "public"."user_preferences"."eatsBreakfastBread", "public"."user_preferences"."eatsGranolaOrCereal", "public"."user_preferences"."wantsRestDays", "public"."user_preferences"."usesFrozenFoods", "public"."user_preferences"."usesPreparedFoods", "public"."user_preferences"."allergies", "public"."user_preferences"."createdAt", "public"."user_preferences"."updatedAt" FROM "public"."user_preferences" WHERE ("public"."user_preferences"."userId" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."meal_plans"."id", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId" FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2) OFFSET $3
+prisma:query SELECT "public"."recipes"."id", "public"."recipes"."name", "public"."recipes"."category"::text, "public"."recipes"."cookingTime", "public"."recipes"."difficulty", "public"."recipes"."servings", "public"."recipes"."tags", "public"."recipes"."nutrition" FROM "public"."recipes" WHERE 1=1 OFFSET $1
+prisma:query SELECT "public"."recipe_ingredients"."id", "public"."recipe_ingredients"."ingredientId", "public"."recipe_ingredients"."recipeId" FROM "public"."recipe_ingredients" WHERE "public"."recipe_ingredients"."recipeId" IN ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52,$53,$54,$55,$56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66,$67,$68,$69,$70,$71,$72,$73,$74,$75,$76,$77,$78,$79,$80,$81,$82,$83,$84,$85,$86,$87,$88,$89,$90,$91,$92,$93,$94,$95,$96,$97,$98,$99,$100,$101,$102,$103,$104,$105,$106,$107,$108,$109,$110,$111,$112,$113,$114,$115,$116,$117,$118,$119,$120,$121,$122,$123,$124,$125,$126,$127,$128,$129,$130,$131,$132,$133,$134,$135,$136,$137,$138,$139,$140,$141,$142,$143,$144,$145,$146,$147,$148,$149,$150,$151,$152,$153,$154,$155,$156,$157,$158,$159,$160,$161,$162,$163,$164,$165,$166) OFFSET $167
+prisma:query SELECT "public"."ingredients"."id", "public"."ingredients"."name" FROM "public"."ingredients" WHERE "public"."ingredients"."id" IN ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52,$53,$54,$55,$56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66,$67,$68,$69) OFFSET $70
+✅ ユーザー設定: {
+  id: 'cmdx1uy0o000142pz2zpr9anz',
+  userId: 'demo-user',
+  familySize: 2,
+  hasChildren: false,
+  hasElderly: false,
+  allowsCurryTwoDays: true,
+  eatsBreakfastBread: true,
+  eatsGranolaOrCereal: false,
+  wantsRestDays: true,
+  usesFrozenFoods: true,
+  usesPreparedFoods: true,
+  allergies: [],
+  createdAt: 2025-08-04T11:51:27.672Z,
+  updatedAt: 2025-08-04T11:51:27.672Z
+}
+✅ レシピ数: 166
+✅ 最近使用レシピID数: 29
+📊 データ取得完了: 106ms
+🔍 dinnerフィルタリング完了: 64件
+⚡ dinner献立生成完了: 106ms
+🎉 dinner献立生成完了: 総処理時間 106ms
+⚡ dinner献立生成完了: 106ms
+💾 部分保存処理開始...
+💾 dinnerの部分的保存開始...
+prisma:query BEGIN
+prisma:query SELECT "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt" FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2 AND "public"."meal_plans"."date" < $3) LIMIT $4 OFFSET $5
+prisma:query UPDATE "public"."meal_plans" SET "isGenerated" = $1, "generationSettings" = $2, "dinnerId" = $3, "updatedAt" = $4 WHERE ("public"."meal_plans"."id" = $5 AND 1=1) RETURNING "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt"
+prisma:query SELECT "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt" FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2 AND "public"."meal_plans"."date" < $3) LIMIT $4 OFFSET $5
+prisma:query UPDATE "public"."meal_plans" SET "isGenerated" = $1, "generationSettings" = $2, "dinnerId" = $3, "updatedAt" = $4 WHERE ("public"."meal_plans"."id" = $5 AND 1=1) RETURNING "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt"
+prisma:query SELECT "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt" FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2 AND "public"."meal_plans"."date" < $3) LIMIT $4 OFFSET $5
+prisma:query UPDATE "public"."meal_plans" SET "isGenerated" = $1, "generationSettings" = $2, "dinnerId" = $3, "updatedAt" = $4 WHERE ("public"."meal_plans"."id" = $5 AND 1=1) RETURNING "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt"
+prisma:query SELECT "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt" FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2 AND "public"."meal_plans"."date" < $3) LIMIT $4 OFFSET $5
+prisma:query UPDATE "public"."meal_plans" SET "isGenerated" = $1, "generationSettings" = $2, "dinnerId" = $3, "updatedAt" = $4 WHERE ("public"."meal_plans"."id" = $5 AND 1=1) RETURNING "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt"
+prisma:query SELECT "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt" FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2 AND "public"."meal_plans"."date" < $3) LIMIT $4 OFFSET $5
+prisma:query UPDATE "public"."meal_plans" SET "isGenerated" = $1, "generationSettings" = $2, "dinnerId" = $3, "updatedAt" = $4 WHERE ("public"."meal_plans"."id" = $5 AND 1=1) RETURNING "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt"
+prisma:query SELECT "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt" FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2 AND "public"."meal_plans"."date" < $3) LIMIT $4 OFFSET $5
+prisma:query UPDATE "public"."meal_plans" SET "isGenerated" = $1, "generationSettings" = $2, "dinnerId" = $3, "updatedAt" = $4 WHERE ("public"."meal_plans"."id" = $5 AND 1=1) RETURNING "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt"
+prisma:query SELECT "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt" FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2 AND "public"."meal_plans"."date" < $3) LIMIT $4 OFFSET $5
+prisma:query UPDATE "public"."meal_plans" SET "isGenerated" = $1, "generationSettings" = $2, "dinnerId" = $3, "updatedAt" = $4 WHERE ("public"."meal_plans"."id" = $5 AND 1=1) RETURNING "public"."meal_plans"."id", "public"."meal_plans"."userId", "public"."meal_plans"."date", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId", "public"."meal_plans"."isGenerated", "public"."meal_plans"."generationSettings", "public"."meal_plans"."userRating", "public"."meal_plans"."familyFeedback", "public"."meal_plans"."notes", "public"."meal_plans"."weeklyMealPlanId", "public"."meal_plans"."createdAt", "public"."meal_plans"."updatedAt"
+💾 dinnerの部分的保存完了: 288ms
+✅ 部分保存処理完了
+🎉 API全体処理時間: 396ms
+ POST /api/meal-plan/generate-partial 200 in 416ms
+prisma:query COMMIT
+prisma:error Error in PostgreSQL connection: Error { kind: Io, cause: Some(Os { code: 104, kind: ConnectionReset, message: "Connection reset by peer" }) }
+prisma:error Error in PostgreSQL connection: Error { kind: Io, cause: Some(Os { code: 104, kind: ConnectionReset, message: "Connection reset by peer" }) }
+prisma:error Error in PostgreSQL connection: Error { kind: Io, cause: Some(Os { code: 104, kind: ConnectionReset, message: "Connection reset by peer" }) }

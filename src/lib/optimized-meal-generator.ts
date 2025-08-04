@@ -9,6 +9,15 @@ export interface MealGenerationOptions {
   recentMealsDays?: number
 }
 
+export interface PartialMealGenerationOptions {
+  userId: string
+  weekStartDate: Date
+  mealType: 'breakfast' | 'lunch' | 'dinner'
+  considerSeasonality?: boolean
+  avoidRecentMeals?: boolean
+  recentMealsDays?: number
+}
+
 export class OptimizedMealGenerator {
   private async getUserPreferences(userId: string) {
     let preferences = await prisma.userPreferences.findUnique({
@@ -293,6 +302,129 @@ export class OptimizedMealGenerator {
     }
   }
 
+  // 🚀 部分的な献立生成（朝食のみ、夕食のみなど）
+  async generatePartialMealPlan(options: PartialMealGenerationOptions): Promise<any> {
+    const startTime = Date.now()
+    console.log(`🚀 ${options.mealType}のみの献立生成開始`)
+    console.log('📋 オプション:', options)
+
+    const {
+      userId,
+      weekStartDate,
+      mealType,
+      considerSeasonality = true,
+      avoidRecentMeals = true,
+      recentMealsDays = 14
+    } = options
+
+    try {
+      // 🚀 並列処理: ユーザー設定・レシピ・履歴を同時取得
+      console.log('📊 データ取得開始...')
+      
+      const [preferences, recipesData, recentRecipeIds] = await Promise.all([
+        this.getUserPreferences(userId),
+        this.getAllRecipesOptimized(),
+        avoidRecentMeals ? this.getRecentMealPlanIds(userId, recentMealsDays) : Promise.resolve([])
+      ])
+      
+      console.log('✅ ユーザー設定:', preferences)
+      console.log('✅ レシピ数:', recipesData.recipes.length)
+      console.log('✅ 最近使用レシピID数:', recentRecipeIds.length)
+
+      console.log(`📊 データ取得完了: ${Date.now() - startTime}ms`)
+
+      const { categorizedRecipes } = recipesData
+      
+      // メモリ内でフィルタリング（指定された食事タイプのみ）
+      const filteredRecipes = this.filterRecipesInMemory(
+        categorizedRecipes[mealType], 
+        preferences.allergies, 
+        recentRecipeIds
+      )
+
+      console.log(`🔍 ${mealType}フィルタリング完了: ${filteredRecipes.length}件`)
+
+      // 週の日付を生成
+      const weekDates = []
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(weekStartDate)
+        date.setDate(weekStartDate.getDate() + i)
+        weekDates.push(date)
+      }
+
+      const generatedPlans: any[] = []
+      const usedRecipeIds = new Set<string>()
+
+      // 🚀 高速生成: 指定された食事タイプのみ生成
+      for (let dayIndex = 0; dayIndex < weekDates.length; dayIndex++) {
+        const date = weekDates[dayIndex]
+        
+        let selectedRecipe = null
+
+        // 食事タイプに応じてレシピを選択
+        if (mealType === 'breakfast' && (preferences.eatsBreakfastBread || preferences.eatsGranolaOrCereal)) {
+          selectedRecipe = this.selectRandomRecipe(filteredRecipes, usedRecipeIds)
+        } else if (mealType === 'lunch') {
+          // 昼食候補がない場合は夕食レシピからも選択
+          let lunchCandidates = filteredRecipes
+          if (lunchCandidates.length === 0) {
+            const dinnerRecipes = this.filterRecipesInMemory(
+              categorizedRecipes.dinner, 
+              preferences.allergies, 
+              recentRecipeIds
+            )
+            lunchCandidates = dinnerRecipes
+          }
+          selectedRecipe = this.selectRandomRecipe(lunchCandidates, usedRecipeIds)
+        } else if (mealType === 'dinner') {
+          selectedRecipe = this.selectRandomRecipe(filteredRecipes, usedRecipeIds)
+        }
+
+        if (selectedRecipe) {
+          usedRecipeIds.add(selectedRecipe.id)
+        }
+
+        // 休憩日の処理（夕食のみの場合）
+        if (mealType === 'dinner' && preferences.wantsRestDays && dayIndex === Math.floor(Math.random() * 7)) {
+          selectedRecipe = {
+            id: `rest-day-${dayIndex}`,
+            name: preferences.usesFrozenFoods ? '冷凍餃子' : 'お惣菜',
+            isRestDay: true,
+            cookingTime: 5,
+            difficulty: 1
+          }
+        }
+
+        generatedPlans.push({
+          date,
+          [mealType]: selectedRecipe
+        })
+      }
+
+      console.log(`⚡ ${mealType}献立生成完了: ${Date.now() - startTime}ms`)
+
+      const result = {
+        weekStartDate,
+        mealType,
+        plans: generatedPlans,
+        generatedAt: new Date(),
+        totalTime: Date.now() - startTime,
+        settings: {
+          considerSeasonality,
+          avoidRecentMeals,
+          recentMealsDays
+        }
+      }
+
+      console.log(`🎉 ${mealType}献立生成完了: 総処理時間 ${result.totalTime}ms`)
+      return result
+
+    } catch (error) {
+      console.error(`❌ ${mealType}献立生成エラー:`, error)
+      throw error
+    }
+  }
+
   // 🚀 最適化: バッチ保存
   async saveMealPlanOptimized(userId: string, weeklyPlan: any) {
     const saveStartTime = Date.now()
@@ -353,6 +485,92 @@ export class OptimizedMealGenerator {
 
     } catch (error) {
       console.error('❌ 献立保存エラー:', error)
+      throw error
+    }
+  }
+
+  // 🚀 部分的な保存処理
+  async savePartialMealPlan(userId: string, partialPlan: any) {
+    const saveStartTime = Date.now()
+    
+    try {
+      const startDate = new Date(partialPlan.weekStartDate)
+      const endDate = new Date(startDate)
+      endDate.setDate(startDate.getDate() + 6)
+
+      console.log(`💾 ${partialPlan.mealType}の部分的保存開始...`)
+
+      // 既存の献立データを取得して部分的に更新
+      await prisma.$transaction(async (tx) => {
+        for (const dayPlan of partialPlan.plans) {
+          const date = new Date(dayPlan.date)
+          
+          // 既存の献立プランがあるかチェック
+          const existingPlan = await tx.mealPlan.findFirst({
+            where: {
+              userId,
+              date: {
+                gte: new Date(date.getFullYear(), date.getMonth(), date.getDate()),
+                lt: new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1)
+              }
+            }
+          })
+
+          const recipeId = this.isValidRecipeId(dayPlan[partialPlan.mealType]?.id) 
+            ? dayPlan[partialPlan.mealType].id 
+            : null
+
+          if (existingPlan) {
+            // 既存プランを部分的に更新
+            const updateData: any = {
+              isGenerated: true,
+              generationSettings: JSON.stringify(partialPlan.settings)
+            }
+            
+            if (partialPlan.mealType === 'breakfast') {
+              updateData.breakfastId = recipeId
+            } else if (partialPlan.mealType === 'lunch') {
+              updateData.lunchId = recipeId
+            } else if (partialPlan.mealType === 'dinner') {
+              updateData.dinnerId = recipeId
+            }
+
+            await tx.mealPlan.update({
+              where: { id: existingPlan.id },
+              data: updateData
+            })
+          } else {
+            // 新しいプランを作成
+            const createData: any = {
+              userId,
+              date: dayPlan.date,
+              breakfastId: null,
+              lunchId: null,
+              dinnerId: null,
+              isGenerated: true,
+              generationSettings: JSON.stringify(partialPlan.settings)
+            }
+            
+            if (partialPlan.mealType === 'breakfast') {
+              createData.breakfastId = recipeId
+            } else if (partialPlan.mealType === 'lunch') {
+              createData.lunchId = recipeId
+            } else if (partialPlan.mealType === 'dinner') {
+              createData.dinnerId = recipeId
+            }
+
+            await tx.mealPlan.create({
+              data: createData
+            })
+          }
+        }
+      })
+
+      console.log(`💾 ${partialPlan.mealType}の部分的保存完了: ${Date.now() - saveStartTime}ms`)
+      return { success: true }
+
+    } catch (error) {
+      console.error(`❌ ${partialPlan.mealType}の部分的保存エラー:`, error)
       throw error
     }
   }

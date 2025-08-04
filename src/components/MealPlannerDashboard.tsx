@@ -119,6 +119,41 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
     }
   }
 
+  const generatePartialMealPlan = async (mealType: 'breakfast' | 'lunch' | 'dinner') => {
+    setGenerating(true)
+    try {
+      const weekStart = getWeekStartDate(currentWeek)
+      const response = await fetch('/api/meal-plan/generate-partial', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: currentUser.id,
+          weekStartDate: weekStart.toISOString(),
+          mealType: mealType,
+          considerSeasonality: true,
+          avoidRecentMeals: true,
+          recentMealsDays: 14,
+          includeVariety: true,
+          maxSameCategoryPerWeek: 2
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        // 生成後に献立を再取得
+        await fetchMealPlans(weekStart)
+      } else {
+        console.error(`Failed to generate ${mealType} meal plan`)
+      }
+    } catch (error) {
+      console.error(`Error generating ${mealType} meal plan:`, error)
+    } finally {
+      setGenerating(false)
+    }
+  }
+
   useEffect(() => {
     const weekStart = getWeekStartDate(currentWeek)
     fetchMealPlans(weekStart)
@@ -346,15 +381,15 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="cursor-pointer hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <ChefHat className="w-5 h-5 mr-2 text-green-600" />
-                献立を自動生成
+                全献立自動生成
               </CardTitle>
               <CardDescription>
-                あなたの好みに基づいて1週間の献立を自動で作成します
+                朝食・昼食・夕食すべての献立を自動作成
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -369,7 +404,65 @@ export default function MealPlannerDashboard({ currentUser, onLogout }: MealPlan
                     生成中...
                   </>
                 ) : (
-                  '今すぐ生成'
+                  '全自動生成'
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <ChefHat className="w-5 h-5 mr-2 text-yellow-600" />
+                朝食のみ生成
+              </CardTitle>
+              <CardDescription>
+                朝食の献立のみを自動作成します
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                variant="outline"
+                className="w-full" 
+                onClick={() => generatePartialMealPlan('breakfast')}
+                disabled={generating}
+              >
+                {generating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    生成中...
+                  </>
+                ) : (
+                  '朝食生成'
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <ChefHat className="w-5 h-5 mr-2 text-purple-600" />
+                夕食のみ生成
+              </CardTitle>
+              <CardDescription>
+                夕食の献立のみを自動作成します
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                variant="outline"
+                className="w-full" 
+                onClick={() => generatePartialMealPlan('dinner')}
+                disabled={generating}
+              >
+                {generating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    生成中...
+                  </>
+                ) : (
+                  '夕食生成'
                 )}
               </Button>
             </CardContent>

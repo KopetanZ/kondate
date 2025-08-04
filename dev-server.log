@@ -1,0 +1,221 @@
+
+> meal-planner-app@0.1.0 dev
+> next dev --turbopack
+
+   ▲ Next.js 15.4.5 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://10.255.255.254:3000
+   - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 730ms
+ ○ Compiling /api/test-db ...
+ ✓ Compiled /api/test-db in 851ms
+🔍 データベース接続テスト開始
+prisma:query SELECT COUNT(*) AS "_count._all" FROM (SELECT "public"."users"."id" FROM "public"."users" WHERE 1=1 OFFSET $1) AS "sub"
+prisma:query SELECT COUNT(*) AS "_count._all" FROM (SELECT "public"."recipes"."id" FROM "public"."recipes" WHERE 1=1 OFFSET $1) AS "sub"
+✅ データベース接続成功
+👥 ユーザー数: 2
+🍽️ レシピ数: 166
+ GET /api/test-db 200 in 1289ms
+ ✓ Compiled /api/meal-plan/generate-optimized in 116ms
+🚀 最適化献立生成API開始
+📝 リクエストボディ: {
+  userId: 'demo-user',
+  weekStartDate: '2025-08-04T12:40:03.029Z',
+  considerSeasonality: true,
+  avoidRecentMeals: true,
+  recentMealsDays: 14,
+  includeVariety: true,
+  maxSameCategoryPerWeek: 2
+}
+🔧 パラメータ: {
+  userId: 'demo-user',
+  weekStartDate: '2025-08-04T12:40:03.029Z',
+  considerSeasonality: true,
+  avoidRecentMeals: true,
+  recentMealsDays: 14
+}
+🏗️ OptimizedMealGeneratorインスタンスを作成中...
+✅ OptimizedMealGeneratorインスタンス作成完了
+📊 献立生成開始...
+🚀 最適化された献立生成開始
+📋 オプション: {
+  userId: 'demo-user',
+  weekStartDate: 2025-08-04T12:40:03.029Z,
+  considerSeasonality: true,
+  avoidRecentMeals: true,
+  recentMealsDays: 14
+}
+📊 データ取得開始...
+👤 ユーザー設定取得中...
+🍽️ レシピデータ取得中...
+📜 履歴データ取得中...
+prisma:query SELECT 1
+prisma:query SELECT "public"."recipes"."id", "public"."recipes"."name", "public"."recipes"."category"::text, "public"."recipes"."cookingTime", "public"."recipes"."difficulty", "public"."recipes"."servings", "public"."recipes"."tags", "public"."recipes"."nutrition" FROM "public"."recipes" WHERE 1=1 OFFSET $1
+prisma:query SELECT "public"."recipe_ingredients"."id", "public"."recipe_ingredients"."ingredientId", "public"."recipe_ingredients"."recipeId" FROM "public"."recipe_ingredients" WHERE "public"."recipe_ingredients"."recipeId" IN ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52,$53,$54,$55,$56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66,$67,$68,$69,$70,$71,$72,$73,$74,$75,$76,$77,$78,$79,$80,$81,$82,$83,$84,$85,$86,$87,$88,$89,$90,$91,$92,$93,$94,$95,$96,$97,$98,$99,$100,$101,$102,$103,$104,$105,$106,$107,$108,$109,$110,$111,$112,$113,$114,$115,$116,$117,$118,$119,$120,$121,$122,$123,$124,$125,$126,$127,$128,$129,$130,$131,$132,$133,$134,$135,$136,$137,$138,$139,$140,$141,$142,$143,$144,$145,$146,$147,$148,$149,$150,$151,$152,$153,$154,$155,$156,$157,$158,$159,$160,$161,$162,$163,$164,$165,$166) OFFSET $167
+prisma:query SELECT "public"."ingredients"."id", "public"."ingredients"."name" FROM "public"."ingredients" WHERE "public"."ingredients"."id" IN ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52,$53,$54,$55,$56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66,$67,$68,$69) OFFSET $70
+prisma:query SELECT "public"."user_preferences"."id", "public"."user_preferences"."userId", "public"."user_preferences"."familySize", "public"."user_preferences"."hasChildren", "public"."user_preferences"."hasElderly", "public"."user_preferences"."allowsCurryTwoDays", "public"."user_preferences"."eatsBreakfastBread", "public"."user_preferences"."eatsGranolaOrCereal", "public"."user_preferences"."wantsRestDays", "public"."user_preferences"."usesFrozenFoods", "public"."user_preferences"."usesPreparedFoods", "public"."user_preferences"."allergies", "public"."user_preferences"."createdAt", "public"."user_preferences"."updatedAt" FROM "public"."user_preferences" WHERE ("public"."user_preferences"."userId" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."meal_plans"."id", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId" FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2) OFFSET $3
+✅ ユーザー設定: {
+  id: 'cmdx1uy0o000142pz2zpr9anz',
+  userId: 'demo-user',
+  familySize: 2,
+  hasChildren: false,
+  hasElderly: false,
+  allowsCurryTwoDays: true,
+  eatsBreakfastBread: true,
+  eatsGranolaOrCereal: false,
+  wantsRestDays: true,
+  usesFrozenFoods: true,
+  usesPreparedFoods: true,
+  allergies: [],
+  createdAt: 2025-08-04T11:51:27.672Z,
+  updatedAt: 2025-08-04T11:51:27.672Z
+}
+✅ レシピ数: 166
+✅ 最近使用レシピID数: 23
+📊 データ取得完了: 149ms
+🔍 フィルタリング完了: 朝食29件, 昼食48件, 夕食66件
+⚡ 献立生成完了: 149ms
+🎉 献立生成完了: 総処理時間 149ms
+⚡ 献立生成完了: 149ms
+💾 保存処理開始...
+prisma:query BEGIN
+prisma:query DELETE FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2 AND "public"."meal_plans"."date" <= $3)
+prisma:query DELETE FROM "public"."weekly_meal_plans" WHERE ("public"."weekly_meal_plans"."userId" = $1 AND "public"."weekly_meal_plans"."weekStartDate" = $2)
+prisma:query INSERT INTO "public"."weekly_meal_plans" ("id","userId","weekStartDate","totalNutrition","createdAt","updatedAt") VALUES ($1,$2,$3,$4,$5,$6) RETURNING "public"."weekly_meal_plans"."id", "public"."weekly_meal_plans"."userId", "public"."weekly_meal_plans"."weekStartDate", "public"."weekly_meal_plans"."totalNutrition", "public"."weekly_meal_plans"."createdAt", "public"."weekly_meal_plans"."updatedAt"
+prisma:query INSERT INTO "public"."meal_plans" ("id","userId","date","breakfastId","lunchId","dinnerId","isGenerated","generationSettings","weeklyMealPlanId","createdAt","updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11), ($12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22), ($23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33), ($34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44), ($45,$46,$47,$48,$49,$50,$51,$52,$53,$54,$55), ($56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66), ($67,$68,$69,$70,$71,$72,$73,$74,$75,$76,$77)
+prisma:error 
+Invalid `tx.mealPlan.createMany()` invocation in
+/home/kopetan/research/kondate/meal-planner-app/meal-planner-app/.next/server/chunks/[root-of-the-server]__b47cf7a4._.js:378:35
+
+  375         generationSettings: JSON.stringify(weeklyPlan.settings),
+  376         weeklyMealPlanId: weeklyMealPlan.id
+  377     }));
+→ 378 await tx.mealPlan.createMany(
+Foreign key constraint violated on the constraint: `meal_plans_dinnerId_fkey`
+prisma:query ROLLBACK
+❌ 献立保存エラー: Error [PrismaClientKnownRequestError]: 
+Invalid `tx.mealPlan.createMany()` invocation in
+/home/kopetan/research/kondate/meal-planner-app/meal-planner-app/.next/server/chunks/[root-of-the-server]__b47cf7a4._.js:378:35
+
+  375         generationSettings: JSON.stringify(weeklyPlan.settings),
+  376         weeklyMealPlanId: weeklyMealPlan.id
+  377     }));
+→ 378 await tx.mealPlan.createMany(
+Foreign key constraint violated on the constraint: `meal_plans_dinnerId_fkey`
+    at <unknown> (src/lib/optimized-meal-generator.ts:330:26)
+    at async (src/lib/optimized-meal-generator.ts:330:8)
+    at async OptimizedMealGenerator.saveMealPlanOptimized (src/lib/optimized-meal-generator.ts:292:6)
+    at async POST (src/app/api/meal-plan/generate-optimized/route.ts:54:4)
+  328 |         }))
+  329 |
+> 330 |         await tx.mealPlan.createMany({
+      |                          ^
+  331 |           data: mealPlanData
+  332 |         })
+  333 | {
+  code: 'P2003',
+  meta: [Object],
+  clientVersion: '6.13.0'
+}
+❌ 最適化献立生成エラー: Error [PrismaClientKnownRequestError]: 
+Invalid `tx.mealPlan.createMany()` invocation in
+/home/kopetan/research/kondate/meal-planner-app/meal-planner-app/.next/server/chunks/[root-of-the-server]__b47cf7a4._.js:378:35
+
+  375         generationSettings: JSON.stringify(weeklyPlan.settings),
+  376         weeklyMealPlanId: weeklyMealPlan.id
+  377     }));
+→ 378 await tx.mealPlan.createMany(
+Foreign key constraint violated on the constraint: `meal_plans_dinnerId_fkey`
+    at <unknown> (src/lib/optimized-meal-generator.ts:330:26)
+    at async (src/lib/optimized-meal-generator.ts:330:8)
+    at async OptimizedMealGenerator.saveMealPlanOptimized (src/lib/optimized-meal-generator.ts:292:6)
+    at async POST (src/app/api/meal-plan/generate-optimized/route.ts:54:4)
+  328 |         }))
+  329 |
+> 330 |         await tx.mealPlan.createMany({
+      |                          ^
+  331 |           data: mealPlanData
+  332 |         })
+  333 | {
+  code: 'P2003',
+  meta: [Object],
+  clientVersion: '6.13.0'
+}
+ POST /api/meal-plan/generate-optimized 500 in 737ms
+🚀 最適化献立生成API開始
+📝 リクエストボディ: {
+  userId: 'demo-user',
+  weekStartDate: '2025-08-04T12:40:39.258Z',
+  considerSeasonality: true,
+  avoidRecentMeals: true,
+  recentMealsDays: 14,
+  includeVariety: true,
+  maxSameCategoryPerWeek: 2
+}
+🔧 パラメータ: {
+  userId: 'demo-user',
+  weekStartDate: '2025-08-04T12:40:39.258Z',
+  considerSeasonality: true,
+  avoidRecentMeals: true,
+  recentMealsDays: 14
+}
+🏗️ OptimizedMealGeneratorインスタンスを作成中...
+✅ OptimizedMealGeneratorインスタンス作成完了
+📊 献立生成開始...
+🚀 最適化された献立生成開始
+📋 オプション: {
+  userId: 'demo-user',
+  weekStartDate: 2025-08-04T12:40:39.258Z,
+  considerSeasonality: true,
+  avoidRecentMeals: true,
+  recentMealsDays: 14
+}
+📊 データ取得開始...
+👤 ユーザー設定取得中...
+🍽️ レシピデータ取得中...
+📜 履歴データ取得中...
+prisma:query SELECT 1
+prisma:query SELECT 1
+prisma:query SELECT 1
+prisma:query SELECT "public"."meal_plans"."id", "public"."meal_plans"."breakfastId", "public"."meal_plans"."lunchId", "public"."meal_plans"."dinnerId" FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2) OFFSET $3
+prisma:query SELECT "public"."user_preferences"."id", "public"."user_preferences"."userId", "public"."user_preferences"."familySize", "public"."user_preferences"."hasChildren", "public"."user_preferences"."hasElderly", "public"."user_preferences"."allowsCurryTwoDays", "public"."user_preferences"."eatsBreakfastBread", "public"."user_preferences"."eatsGranolaOrCereal", "public"."user_preferences"."wantsRestDays", "public"."user_preferences"."usesFrozenFoods", "public"."user_preferences"."usesPreparedFoods", "public"."user_preferences"."allergies", "public"."user_preferences"."createdAt", "public"."user_preferences"."updatedAt" FROM "public"."user_preferences" WHERE ("public"."user_preferences"."userId" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query SELECT "public"."recipes"."id", "public"."recipes"."name", "public"."recipes"."category"::text, "public"."recipes"."cookingTime", "public"."recipes"."difficulty", "public"."recipes"."servings", "public"."recipes"."tags", "public"."recipes"."nutrition" FROM "public"."recipes" WHERE 1=1 OFFSET $1
+prisma:query SELECT "public"."recipe_ingredients"."id", "public"."recipe_ingredients"."ingredientId", "public"."recipe_ingredients"."recipeId" FROM "public"."recipe_ingredients" WHERE "public"."recipe_ingredients"."recipeId" IN ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52,$53,$54,$55,$56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66,$67,$68,$69,$70,$71,$72,$73,$74,$75,$76,$77,$78,$79,$80,$81,$82,$83,$84,$85,$86,$87,$88,$89,$90,$91,$92,$93,$94,$95,$96,$97,$98,$99,$100,$101,$102,$103,$104,$105,$106,$107,$108,$109,$110,$111,$112,$113,$114,$115,$116,$117,$118,$119,$120,$121,$122,$123,$124,$125,$126,$127,$128,$129,$130,$131,$132,$133,$134,$135,$136,$137,$138,$139,$140,$141,$142,$143,$144,$145,$146,$147,$148,$149,$150,$151,$152,$153,$154,$155,$156,$157,$158,$159,$160,$161,$162,$163,$164,$165,$166) OFFSET $167
+prisma:query SELECT "public"."ingredients"."id", "public"."ingredients"."name" FROM "public"."ingredients" WHERE "public"."ingredients"."id" IN ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52,$53,$54,$55,$56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66,$67,$68,$69) OFFSET $70
+✅ ユーザー設定: {
+  id: 'cmdx1uy0o000142pz2zpr9anz',
+  userId: 'demo-user',
+  familySize: 2,
+  hasChildren: false,
+  hasElderly: false,
+  allowsCurryTwoDays: true,
+  eatsBreakfastBread: true,
+  eatsGranolaOrCereal: false,
+  wantsRestDays: true,
+  usesFrozenFoods: true,
+  usesPreparedFoods: true,
+  allergies: [],
+  createdAt: 2025-08-04T11:51:27.672Z,
+  updatedAt: 2025-08-04T11:51:27.672Z
+}
+✅ レシピ数: 166
+✅ 最近使用レシピID数: 23
+📊 データ取得完了: 107ms
+🔍 フィルタリング完了: 朝食29件, 昼食48件, 夕食66件
+⚡ 献立生成完了: 107ms
+🎉 献立生成完了: 総処理時間 107ms
+⚡ 献立生成完了: 107ms
+💾 保存処理開始...
+prisma:query BEGIN
+prisma:query DELETE FROM "public"."meal_plans" WHERE ("public"."meal_plans"."userId" = $1 AND "public"."meal_plans"."date" >= $2 AND "public"."meal_plans"."date" <= $3)
+prisma:query DELETE FROM "public"."weekly_meal_plans" WHERE ("public"."weekly_meal_plans"."userId" = $1 AND "public"."weekly_meal_plans"."weekStartDate" = $2)
+prisma:query INSERT INTO "public"."weekly_meal_plans" ("id","userId","weekStartDate","totalNutrition","createdAt","updatedAt") VALUES ($1,$2,$3,$4,$5,$6) RETURNING "public"."weekly_meal_plans"."id", "public"."weekly_meal_plans"."userId", "public"."weekly_meal_plans"."weekStartDate", "public"."weekly_meal_plans"."totalNutrition", "public"."weekly_meal_plans"."createdAt", "public"."weekly_meal_plans"."updatedAt"
+prisma:query INSERT INTO "public"."meal_plans" ("id","userId","date","breakfastId","lunchId","dinnerId","isGenerated","generationSettings","weeklyMealPlanId","createdAt","updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11), ($12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22), ($23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33), ($34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44), ($45,$46,$47,$48,$49,$50,$51,$52,$53,$54,$55), ($56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66), ($67,$68,$69,$70,$71,$72,$73,$74,$75,$76,$77)
+💾 保存完了: 148ms
+✅ 保存処理完了
+🎉 API全体処理時間: 257ms
+ POST /api/meal-plan/generate-optimized 200 in 326ms
+prisma:query COMMIT

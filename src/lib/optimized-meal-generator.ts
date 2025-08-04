@@ -138,6 +138,20 @@ export class OptimizedMealGenerator {
     return availableRecipes[randomIndex]
   }
 
+  // 有効なレシピIDかどうかをチェック（フォールバックや一時的IDを除外）
+  private isValidRecipeId(recipeId: string | undefined): boolean {
+    if (!recipeId) return false
+    
+    // フォールバックIDや一時的IDを除外
+    if (recipeId.startsWith('fallback-') || 
+        recipeId.startsWith('error-') || 
+        recipeId.startsWith('rest-day-')) {
+      return false
+    }
+    
+    return true
+  }
+
   async generateWeeklyMealPlanOptimized(options: MealGenerationOptions): Promise<any> {
     const startTime = Date.now()
     console.log('🚀 最適化された献立生成開始')
@@ -315,13 +329,13 @@ export class OptimizedMealGenerator {
           }
         })
 
-        // 日次献立をバッチ作成
+        // 日次献立をバッチ作成（存在しないレシピIDをnullに変換）
         const mealPlanData = weeklyPlan.plans.map((dayPlan: any) => ({
           userId,
           date: dayPlan.date,
-          breakfastId: dayPlan.breakfast?.id || null,
-          lunchId: dayPlan.lunch?.id || null,
-          dinnerId: dayPlan.dinner?.id || null,
+          breakfastId: this.isValidRecipeId(dayPlan.breakfast?.id) ? dayPlan.breakfast.id : null,
+          lunchId: this.isValidRecipeId(dayPlan.lunch?.id) ? dayPlan.lunch.id : null,
+          dinnerId: this.isValidRecipeId(dayPlan.dinner?.id) ? dayPlan.dinner.id : null,
           isGenerated: true,
           generationSettings: JSON.stringify(weeklyPlan.settings),
           weeklyMealPlanId: weeklyMealPlan.id
